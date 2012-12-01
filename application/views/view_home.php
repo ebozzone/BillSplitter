@@ -6,7 +6,7 @@
 <body>
 
 <div id="container">
-	<h1>Welcome to Bill Splitter!</h1>
+	<h1>sajfahsdfhabsodubh!</h1>
 	
 	</br>
 	
