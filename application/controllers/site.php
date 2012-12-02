@@ -36,7 +36,7 @@ class Site extends CI_Controller {
 
 
 		$newRow = array(
-			"billId" => "1234567890", 
+			"billId" => time(), 
 			"item" => $item,//"Car Rental", 
 			"amount" => $amount,//"250", 
 			"name" => $this->tempNameForFriend($payer),//, 
@@ -82,6 +82,14 @@ class Site extends CI_Controller {
 		}
 
 		return $friendName;
+	}
+
+	function deleteItem(){
+		$billId = $this->input->post('rowId');
+		$this->load->model("get_db");
+		$this->get_db->deleteBillId($billId);
+		$this->home();
+
 	}
 
 

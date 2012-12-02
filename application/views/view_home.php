@@ -2,6 +2,33 @@
 <html>
 <head>
 	<title><?php echo $title; ?></title>
+
+	<script>
+		<!--
+			/*window.onload = function() {
+
+				var deleteButtons = document.getElementsByClassName('deleteButton');
+				var buttonsCount = deleteButtons.length;
+				for (var i = 0; i <= buttonsCount; i += 1) {
+					deleteButtons[i].onclick = function() {
+						var buttonId = this.id;
+						var form = document.createElement('form');
+						form.setAttribute('method', 'post');
+						form.setAttribute('action', 'deleteItem');
+						form.style.display = 'hidden';
+						var dataField = document.createElement("rowId");
+						dataField.setAttribute("name", "buttonId");
+						dataField.setAttribute("value", buttonId);
+						form.appendChild(dataField);
+						document.body.appendChild(form);
+						form.submit();
+					}
+				}
+			}*/
+
+		-->
+	</script>
+
 </head>
 <body>
 
@@ -20,6 +47,7 @@
 			<th>Friend 3</th>
 			<th>Friend 4</th>
 			<th>Friend 5</th>
+			<th>Actions</th>
 		</tr>
 
 		<?php
@@ -34,6 +62,8 @@
 				echo "<td>" . form_checkbox(array('checked' => $row->friend3,'disabled' => 'disabled')) . "</td>";
 				echo "<td>" . form_checkbox(array('checked' => $row->friend4,'disabled' => 'disabled')) . "</td>";
 				echo "<td>" . form_checkbox(array('checked' => $row->friend5,'disabled' => 'disabled')) . "</td>";
+				echo "<td>" . form_open('site/deleteItem', '', array('rowId' => $row->billId)) . form_submit('deleteRow', 'Delete!') .  form_close() . "</td>";
+				//echo "<td>" . form_button(array('name' => 'deleteRow', 'id' => 'deleteRow'.$index, 'content' => 'Delete', 'class' => 'deleteButton')) . "</td>";
 				echo "</tr>";
 			}
 
@@ -43,14 +73,14 @@
 
 			<?php // need to create a function within site.php to add a row, but I dunno how to link to that function from here (below is just a guess)
 			echo form_open('site/addBill'); ?> 
-			<td><?php echo form_input('item', 'Item'); ?></td>
+			<td><?php echo form_input(array('name' => 'item', 'value' => 'Item', 'autofocus' => 'autofocus')); ?></td>
 			<td><?php echo form_input('amount', 'Amount'); ?></td>
 			<td><?php echo form_dropdown('payers', $options, ''); ?></td>
-			<td><?php echo form_checkbox('friend1', 'accept', TRUE); ?></td>
-			<td><?php echo form_checkbox('friend2', 'accept', TRUE); ?></td>
-			<td><?php echo form_checkbox('friend3', 'accept', TRUE); ?></td>
-			<td><?php echo form_checkbox('friend4', 'accept', TRUE); ?></td>
-			<td><?php echo form_checkbox('friend5', 'accept', TRUE); ?></td>
+			<td><?php echo form_checkbox('friend1', 1, TRUE); ?></td>
+			<td><?php echo form_checkbox('friend2', 1, TRUE); ?></td>
+			<td><?php echo form_checkbox('friend3', 1, TRUE); ?></td>
+			<td><?php echo form_checkbox('friend4', 1, TRUE); ?></td>
+			<td><?php echo form_checkbox('friend5', 1, TRUE); ?></td>
 		</tr>
 
 	</table>

@@ -14,6 +14,10 @@ class Get_db extends CI_Model{
 		$this->db->truncate($table);
 	}
 
+	function deleteBillId($billId){
+		$this->db->delete("billsummary", array('billId' => $billId));
+	}
+
 }
 
 ?>
