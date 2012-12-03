@@ -13,20 +13,21 @@ class Site extends CI_Controller {
 	}
 
 	public function home(){
-		$data['title'] = "Evan's title";
+		$data['title'] = "Evan's title BillSplitter";
 		$data['options'] = array(
-                  'select' => 'Select One',
-                  'friend1' => 'Evan',
-                  'friend2' => 'Manu',
-                  'friend3' => 'Jon',
-                  'friend4' => 'Dave',
-                  'friend5' => 'Mary',
-                );
+			'select' => 'Select One',
+			'friend1' => 'Evan',
+			'friend2' => 'Manu',
+			'friend3' => 'Jon',
+			'friend4' => 'Dave',
+			'friend5' => 'Mary',
+			);
 		//load codeigniter helpers
 		$this->load->helper('form');
 		$this->load->model("get_db");
 		//load table of bills for user into an array
 		$data['results'] = $this->get_db->getAll($this->collectionIdForUser());
+		//do the math on who paid, and is owed
 		$data['contributions'] = $this->calculateContributionRows($data['results']);
 		$data['amountsOwed'] = $this->calculateAmountsOwed($data['contributions'], $data['results']);
 		$data['amountsPaid'] = $this->calculateAmountsPaid($data['results']);
