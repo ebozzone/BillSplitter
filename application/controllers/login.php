@@ -39,6 +39,7 @@ class Login extends CI_Controller{
 
 	function processCreateAccount(){
 		$this->load->model('login_model');
+		$this->load->model('permissions_db');
 		$message = NULL;
 
 		$username = $this->security->xss_clean($this->input->post('username'));
@@ -55,8 +56,13 @@ class Login extends CI_Controller{
 			$message = '<font color=red>Password and confirmation must match.</font></br>';
 		}
 		else {
-			//add username and password to database
+			//success! add username and password to database
 			$this->login_model->addUserEntry($username, $password);
+
+			//create a first collection for this user
+			$this->permissions_db->addCollectionIdForUser($newCollectionId, $username);
+
+			//redirect to site
 			redirect('site');
 		}
 

@@ -13,7 +13,7 @@ class Site extends CI_Controller {
 	}
 
 	public function home(){
-		$data['title'] = "Billiam's Bill Splitter App!";
+		$data['title'] = "Manu's Bill Splitter App!";
 		$data['options'] = array(
                   'select' => 'Select One',
                   'friend1' => 'Evan',
@@ -234,6 +234,11 @@ class Site extends CI_Controller {
     	$username = $this->session->userdata('username');
     	$result = $this->permissions_db->getPermissionsForUser($username);
     	return $result[0]->collectionId;
+    }
+
+    function generateNewCollectionId(){
+    	// Generates a new collection ID using some algorithm, checks to make sure it hasn't been taken already
+
     }
 
 
