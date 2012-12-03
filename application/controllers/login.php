@@ -1,5 +1,5 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-/* Author: Not Jorge Torres
+/* Jorge Torres supplied some template code for login functionality
  * Description: Login controller class
  */
 class Login extends CI_Controller{
@@ -65,13 +65,22 @@ class Login extends CI_Controller{
 			//create a first collection for this user
 			$this->permissions_db->addCollectionIdPermissionForUser($newCollectionId, $username);
 
-			//redirect to site
-			redirect('site');
+			//redirect to site [this was a bug which logged new user in under the session credentials of the last user that logged out, which suggests that log out didn't clear the session]
+			//redirect('site');
+
+			//log the user in with their newly created credentials (the post from create_acount_view will pass on to the process() method)
+			$this->process();
 		}
 
 		//$data['msg'] = $message;
 		//$this->load->view('create_account_view', $data);
 		$this->createAccount($message);
+	}
+
+	//logout function
+	public function do_logout(){
+		$this->session->sess_destroy();
+		redirect('login');
 	}
 }
 ?>

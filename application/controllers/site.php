@@ -13,7 +13,7 @@ class Site extends CI_Controller {
 	}
 
 	public function home(){
-		$data['title'] = "Evan's title BillSplitter";
+		$data['title'] = "BillSplitter Collection";
 		$data['options'] = array(
 			'select' => 'Select One',
 			'friend1' => 'Evan',

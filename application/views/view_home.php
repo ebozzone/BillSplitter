@@ -33,7 +33,7 @@
 <body>
 
 <div id="container">
-	<h1>Welcome to BillSplitter!</h1>
+	<h1>Welcome to BillSplitter, <?php echo $this->session->userdata('username') ?>!</h1>
 	
 	</br>
 	
@@ -96,7 +96,7 @@
 		echo form_close();
 	?>
 
-	<a href='<?php echo site_url('login');?>'>Logout</a>
+	<a href='<?php echo base_url()?>index.php/site/do_logout'>Logout</a>
 
 </div>
 

@@ -1,5 +1,5 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-/* Author: Someone besides Jorge Torres
+/* Jorge Torres supplied some template code for login functionality 
  * Description: Login model class
  */
 class Login_model extends CI_Model{
