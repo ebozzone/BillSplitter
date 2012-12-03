@@ -22,12 +22,14 @@ class Site extends CI_Controller {
                   'friend4' => 'Dave',
                   'friend5' => 'Mary',
                 );
+		//load codeigniter helpers
 		$this->load->helper('form');
 		$this->load->model("get_db");
+		//load table of bills for user into an array
 		$data['results'] = $this->get_db->getAll($this->collectionIdForUser());
-		$contributions = $this->calculateContributionRows($data['results']);
-		$amountsOwed = $this->calculateAmountsOwed($contributions, $data['results']);
-		$amountsPaid = $this->calculateAmountsPaid($data['results']);
+		$data['contributions'] = $this->calculateContributionRows($data['results']);
+		$data['amountsOwed'] = $this->calculateAmountsOwed($data['contributions'], $data['results']);
+		$data['amountsPaid'] = $this->calculateAmountsPaid($data['results']);
 		//echo "results:"."</br>";
 		//print_r($data['results']);
 		//echo "</br>"."contributions:"."</br>";
@@ -36,9 +38,6 @@ class Site extends CI_Controller {
 		//print_r($amountsOwed);
 		//echo "</br>"."amounts paid:"."</br>";
 		//print_r($amountsPaid);
-		$data['contributions'] = $contributions;
-		$data['amountsOwed'] = $amountsOwed;
-		$data['amountsPaid'] = $amountsPaid;
 		$this->load->view("view_home", $data);
 		}
 
@@ -233,6 +232,7 @@ class Site extends CI_Controller {
 
     	$username = $this->session->userdata('username');
     	$result = $this->permissions_db->getPermissionsForUser($username);
+    	// TODO - need to pull more than one collectionId per user
     	return $result[0]->collectionId;
     }
 

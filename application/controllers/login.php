@@ -59,8 +59,11 @@ class Login extends CI_Controller{
 			//success! add username and password to database
 			$this->login_model->addUserEntry($username, $password);
 
+			// TODO - currently hardcoding $newCollectionId for new users
+			$newCollectionId = 5;
+
 			//create a first collection for this user
-			$this->permissions_db->addCollectionIdForUser($newCollectionId, $username);
+			$this->permissions_db->addCollectionIdPermissionForUser($newCollectionId, $username);
 
 			//redirect to site
 			redirect('site');
