@@ -236,6 +236,11 @@ class Site extends CI_Controller {
     	return $result[0]->collectionId;
     }
 
+    function generateNewCollectionId(){
+    	// Generates a new collection ID using some algorithm, checks to make sure it hasn't been taken already
+
+    }
+
 
 	}
 ?>

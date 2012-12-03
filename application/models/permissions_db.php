@@ -7,6 +7,14 @@ class Permissions_db extends CI_Model{
 		return $query->result();
 	}
 
+	function addCollectionIdPermissionForUser($collectionId, $username){
+		$data = array(
+				'username' => $username,
+				'collectionId' => $collectionId
+			);
+		$this->db->insert("permissions", $data);
+	}
+
 }
 
 ?>
