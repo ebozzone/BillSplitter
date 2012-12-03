@@ -33,7 +33,7 @@
 <body>
 
 <div id="container">
-	<h1>Subdoh Is What Froot Said</h1>
+	<h1>Welcome to BillSplitter!</h1>
 	
 	</br>
 	
@@ -42,17 +42,18 @@
 			<th>Item</th>
 			<th>Amount</th>
 			<th>Payer</th>
-			<th>Friend 1</th>
-			<th>Friend 2</th>
-			<th>Friend 3</th>
-			<th>Friend 4</th>
-			<th>Friend 5</th>
+			<?php
+				for($i = 1; $i < 6; $i++){
+					$friendName = 'friend'.$i;
+					echo "<th>" . $options[$friendName] . "</th>";
+				}
+			?>
 			<th>Actions</th>
 		</tr>
 
 		<?php
 
-			foreach($results as $row){
+			foreach($results as $index=>$row){
 				echo "<tr>";
 				echo "<td>" . $row->item . "</td>";
 				echo "<td>" . $row->amount . "</td>";
@@ -95,9 +96,22 @@
 		echo form_close();
 	?>
 
+	<a href='<?php echo site_url('login');?>'>Logout</a>
 
+</div>
 
-
+<div id = "results">
+	<h2>Here are your results:</h2>
+	</br>
+	<ul>
+		<?php
+			for($i = 1; $i < 6; $i++){
+				$friendName = 'friend'.$i;
+				$discrepancy = $amountsOwed[$friendName] - $amountsPaid[$friendName];
+				echo "<li> " . $options[$friendName] . " paid $" . $amountsPaid[$friendName] . " and his share of the expenses is $" . $amountsOwed[$friendName] . ". He owes <b>$" . $discrepancy . "</b>.</li>";				
+			}
+		?>
+	</ul>
 </div>
 
 </body>

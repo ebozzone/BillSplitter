@@ -1,6 +1,13 @@
 <?php
 
 class Get_db extends CI_Model{
+	
+	function getPermissionsForUser($username){
+		$query = $this->db->query("SELECT collectionId FROM permissions WHERE username = ".$username);
+	}
+
+
+
 	function getAll($collectionId){
 		$query = $this->db->query("SELECT * FROM billsummary WHERE collectionId = ".$collectionId);
 		return $query->result();
@@ -12,17 +19,6 @@ class Get_db extends CI_Model{
 
 	function emptyTable($table){
 		$this->db->truncate($table);
-	}
-
-	function emptyCollection($collectionId) {
-		//prep the query
-		$this->db->where('collectionId', $collectionId);
-
-		//delete the rows
-		$this->db->delete('billsummary');
-
-
-		//	$this->db->query("DELETE * FROM billsummary WHERE collectionId = ".$collectionId);
 	}
 
 	function deleteBillId($billId){
