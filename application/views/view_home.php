@@ -94,12 +94,20 @@
 	?>
 
 	<?php
-		echo form_open('site/emptyBill');
-		echo form_submit('emptyBillSubmit', 'Empty Table');
+		//echo form_open('site/emptyBill');
+		//echo form_submit('emptyBillSubmit', 'Empty Table');
+		//echo form_close();
+	?>
+
+	<p><b>Share this Collection with friends:</b></p>
+	<?php 
+		echo form_open('site/addPermissions', '', array('collectionId' => $this->session->userdata('collectionId')));
+		echo form_input(array('name' => 'emails', 'value' => 'Enter Email(s) Separated by Commas', 'style' => 'width:300px'));
+		echo form_submit('addPermissions', 'Share');
 		echo form_close();
 	?>
 
-	<a href='<?php echo base_url()?>index.php/site/do_logout'>Logout</a>
+	</br><a href='<?php echo base_url()?>index.php/site/do_logout'>Logout</a>
 
 </div>
 

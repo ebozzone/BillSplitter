@@ -240,6 +240,7 @@ class Site extends CI_Controller {
 //    	return $result[0]->collectionId;
 //    }
 
+    // Returns all collectionId's associated with the logged in username
     function collectionPermissionsForUser(){
     	$this->load->model("permissions_db");
     	$username = $this->session->userdata('username');
@@ -252,7 +253,7 @@ class Site extends CI_Controller {
     	$this->home();
     }
 
-    //Collection Manaement
+    //Collection Management
 
 	function createNewCollectionForUser(){
 		$this->load->library('collectionIdManager');
@@ -270,6 +271,24 @@ class Site extends CI_Controller {
 		//$this->home();
 		redirect('site/collectionsList');	
 	}		
+
+	//Adds input email addresses to permissions table for given collectionId and sends invitation emails
+	function addPermissions(){
+		$collectionId = $this->input->post('collectionId');
+		$emails_csv = $this->input->post('emails');
+		$emails_array_dup = str_getcsv($emails_csv); //create array
+		foreach($emails_array_dup as $row){
+			trim($row);
+		} //DOESN'T WORK YET trims off white space from entries
+		$emails_array = array_unique($emails_array_dup); //removes duplicates
+		$this->load->model('permissions_db');
+		//currently can only accept 1 entry in the input - later will accept multiple, and then eventually emails only
+		foreach($emails_array as $row){
+			$this->permissions_db->addCollectionIdPermissionForUser($collectionId, $row);
+		}
+		redirect('site/home');	
+		//$this->home();
+	}
 
 	}
 ?>
