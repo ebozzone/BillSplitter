@@ -35,6 +35,9 @@
 <div id="container">
 	<h1>Welcome to BillSplitter, <?php echo $this->session->userdata('username') ?>!</h1>
 	
+	<a href='<?php echo base_url()?>index.php/site/collectionsList'>Back to List of Collections</a>
+
+	</br>
 	</br>
 	
 	<table border="1" cellpadding="1" cellspacing="1" summary="Bill Splitting Table">
@@ -72,7 +75,7 @@
 
 		<tr>
 
-			<?php // need to create a function within site.php to add a row, but I dunno how to link to that function from here (below is just a guess)
+			<?php
 			echo form_open('site/addBill'); ?> 
 			<td><?php echo form_input(array('name' => 'item', 'value' => 'Item', 'autofocus' => 'autofocus')); ?></td>
 			<td><?php echo form_input('amount', 'Amount'); ?></td>

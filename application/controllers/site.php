@@ -8,8 +8,8 @@ class Site extends CI_Controller {
     }
 
 	public function index() {
-		//$this->collections();
-		$this->home();
+		$this->collectionsList();
+		//$this->home();
 	}
 
 	public function home(){
@@ -26,7 +26,8 @@ class Site extends CI_Controller {
 		$this->load->helper('form');
 		$this->load->model("get_db");
 		//load table of bills for user into an array
-		$data['results'] = $this->get_db->getAll($this->collectionIdForUser());
+		//$data['results'] = $this->get_db->getAll($this->collectionIdForUser());
+		$data['results'] = $this->get_db->getAll($this->session->userdata('collectionId'));
 		//do the math on who paid, and is owed
 		$data['contributions'] = $this->calculateContributionRows($data['results']);
 		$data['amountsOwed'] = $this->calculateAmountsOwed($data['contributions'], $data['results']);
@@ -42,13 +43,12 @@ class Site extends CI_Controller {
 		$this->load->view("view_home", $data);
 		}
 
-	public function collections(){
-		//figure out the collections corresponding to the user
-
-		//load them in an array
-		$collections = array('');
+	public function collectionsList(){
+		$data['title'] = "BillSplitter Dashboard";
+		//load the collections corresponding to the user
+		$data['collections'] = $this->collectionPermissionsForUser();
 		//pass it to the corresponding view
-
+		$this->load->view("view_collections", $data);
 	}
 
 	function addBill(){
@@ -65,7 +65,7 @@ class Site extends CI_Controller {
 
 
 		$newRow = array(
-			"collectionId" => $this->collectionIdForUser(),
+			"collectionId" => $this->session->userdata('collectionId'),
 			"billId" => time(), 
 			"item" => $item,//"Car Rental", 
 			"amount" => $amount,//"250", 
@@ -77,8 +77,8 @@ class Site extends CI_Controller {
 			"friend5" => $friend5//"TRUE"
 		);
 		$this->get_db->insertNewBill($newRow);
-		//$this->home();
-		redirect('site');
+		$this->home();
+		//redirect('site');
 	}
 
 	function emptyBill(){
@@ -88,9 +88,9 @@ class Site extends CI_Controller {
 
 		//$this->get_db->emptyTable($tableToEmpty);
 		//$this->home();
-		$this->get_db->emptyCollection($this->collectionIdForUser());
-
-		redirect('site');
+		$this->get_db->emptyCollection($this->session->userdata('collectionId'));
+		$this->home();
+		//redirect('site');
 	}
 
 	function tempNameForFriend($friendID){
@@ -147,8 +147,8 @@ class Site extends CI_Controller {
 		$billId = $this->input->post('rowId');
 		$this->load->model("get_db");
 		$this->get_db->deleteBillId($billId);
-		//$this->home();
-		redirect('site');
+		$this->home();
+		//redirect('site');
 
 	}
 
@@ -228,13 +228,19 @@ class Site extends CI_Controller {
 
     //Collection Related Stuff
 
-    function collectionIdForUser(){
-    	$this->load->model("permissions_db");
+//    function collectionIdForUser(){
+//    	$this->load->model("permissions_db");
+//    	$username = $this->session->userdata('username');
+//    	$result = $this->permissions_db->getPermissionsForUser($username);
+//    	// TODO - need to pull more than one collectionId per user
+//    	return $result[0]->collectionId;
+//    }
 
+    function collectionPermissionsForUser(){
+    	$this->load->model("permissions_db");
     	$username = $this->session->userdata('username');
     	$result = $this->permissions_db->getPermissionsForUser($username);
-    	// TODO - need to pull more than one collectionId per user
-    	return $result[0]->collectionId;
+    	return $result;
     }
 
     function generateNewCollectionId(){
@@ -242,6 +248,11 @@ class Site extends CI_Controller {
 
     }
 
+    function dashboardLink(){
+    	$this->session->set_userdata('collectionId', $this->input->get('collectionId'));
+    	$this->home();
+    }
+		
 
 	}
 ?>
