@@ -47,6 +47,10 @@ class Site extends CI_Controller {
 		$data['title'] = "BillSplitter Dashboard";
 		//load the collections corresponding to the user
 		$data['collections'] = $this->collectionPermissionsForUser();
+		
+		//load codeigniter helpers
+		$this->load->helper('form');
+
 		//pass it to the corresponding view
 		$this->load->view("view_collections", $data);
 	}
@@ -77,8 +81,8 @@ class Site extends CI_Controller {
 			"friend5" => $friend5//"TRUE"
 		);
 		$this->get_db->insertNewBill($newRow);
-		$this->home();
-		//redirect('site');
+		//$this->home();
+		redirect('site/home');
 	}
 
 	function emptyBill(){
@@ -147,8 +151,8 @@ class Site extends CI_Controller {
 		$billId = $this->input->post('rowId');
 		$this->load->model("get_db");
 		$this->get_db->deleteBillId($billId);
-		$this->home();
-		//redirect('site');
+		//$this->home();
+		redirect('site/home');
 
 	}
 
@@ -243,16 +247,37 @@ class Site extends CI_Controller {
     	return $result;
     }
 
+<<<<<<< HEAD
     public function generateNewCollectionId(){
     	// Generates a new collection ID using some algorithm, checks to make sure it hasn't been taken already
     	return time();
     }
 
+=======
+>>>>>>> Another update
     function dashboardLink(){
     	$this->session->set_userdata('collectionId', $this->input->get('collectionId'));
     	$this->home();
     }
-		
+
+    //Collection Manaement
+
+	function createNewCollectionForUser(){
+		$this->load->library('collectionIdManager');
+		$this->load->model('permissions_db');
+		$newCollectionId = $this->collectionidmanager->generateNewCollectionId();
+		$this->permissions_db->addCollectionIdPermissionForUser($newCollectionId, $this->session->userdata('username')	);
+		$this->session->set_userdata('collectionId', $newCollectionId);
+		$this->home();
+	}
+
+	function removeCollection(){
+		$collectionId = $this->input->post('collectionId');
+		$this->load->model("permissions_db");
+		$this->permissions_db->removePermissionForUser($collectionId, $this->session->userdata('username'));
+		//$this->home();
+		redirect('site/collectionsList');	
+	}		
 
 	}
 ?>

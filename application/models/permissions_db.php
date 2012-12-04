@@ -15,6 +15,10 @@ class Permissions_db extends CI_Model{
 		$this->db->insert("permissions", $data);
 	}
 
+	function removePermissionForUser($collectionId, $username){
+		$this->db->delete("permissions", array('collectionId' => $collectionId, 'username' => $username));
+	}
+
 }
 
 ?>

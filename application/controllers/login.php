@@ -60,14 +60,10 @@ class Login extends CI_Controller{
 			//success! add username and password to database
 			$this->login_model->addUserEntry($username, $password);
 
-			// TODO - currently hardcoding $newCollectionId for new users
-			$newCollectionId = 5;
-
 			//create a first collection for this user
+			$this->load->library('collectionIdManager');
+			$newCollectionId = $this->collectionidmanager->generateNewCollectionId();
 			$this->permissions_db->addCollectionIdPermissionForUser($newCollectionId, $username);
-
-			//redirect to site [this was a bug which logged new user in under the session credentials of the last user that logged out, which suggests that log out didn't clear the session]
-			//redirect('site');
 
 			//log the user in with their newly created credentials (the post from create_acount_view will pass on to the process() method)
 			$this->process();
