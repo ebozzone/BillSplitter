@@ -247,14 +247,6 @@ class Site extends CI_Controller {
     	return $result;
     }
 
-<<<<<<< HEAD
-    public function generateNewCollectionId(){
-    	// Generates a new collection ID using some algorithm, checks to make sure it hasn't been taken already
-    	return time();
-    }
-
-=======
->>>>>>> Another update
     function dashboardLink(){
     	$this->session->set_userdata('collectionId', $this->input->get('collectionId'));
     	$this->home();
