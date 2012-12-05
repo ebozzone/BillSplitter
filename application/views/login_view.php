@@ -10,7 +10,7 @@
 			<h2>User Login</h2>
 			<br />
 			<?php if(! is_null($msg)) echo $msg;?>			
-			<label for='username'>Username</label>
+			<label for='username'>Email Address</label>
 			<input type='text' name='username' id='username' size='25' /><br />
 		
 			<label for='password'>Password</label>

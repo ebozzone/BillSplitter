@@ -25,10 +25,8 @@
 
 			foreach($permissions as $index=>$row){
 				echo "<tr>";
-				echo "<td> <a href='" . base_url() . "index.php/site/dashboardLink?collectionId=" . $row->collectionId . "'>Link to Collection ID # " . $row->collectionId . "</a> </td>";
-				echo "<td> Some Date </td>";
-				echo "<td> Your Friends </td>";
-				echo "<td>" . form_open('site/removePermission', '', array('collectionId' => $row->collectionId)) . form_submit('removeRow', 'Remove') .  form_close() . "</td>";
+				echo "<td>" . echo $row->username . "</td>";
+				echo "<td>" . form_open('site/removePermission', '', array('username' => $row->username)) . form_submit('removePermission', 'Remove') .  form_close() . "</td>";
 				echo "</tr>";
 			}
 

@@ -49,6 +49,9 @@ class Login extends CI_Controller{
 		if (!$this->login_model->validateUserName($username)){
 			$message = '<font color=red>User name is taken.</font></br>';
 		} 
+		else if (!filter_var($username, FILTER_VALIDATE_EMAIL)){
+			$message = '<font color=red>Invalid email address.</font></br>';
+		}
 		else if (strlen($password) < 5) {
 			$message = '<font color=red>Password must be greater than 5 letters.</font></br>';
 		}

@@ -106,6 +106,16 @@
 		echo form_submit('addPermissions', 'Share');
 		echo form_close();
 	?>
+	<?php
+		if($this->session->flashdata('emails_array_invalid') != NULL){
+			echo "<font color=red>Invalid Emails Entered: ";
+			foreach($this->session->flashdata('emails_array_invalid') as $email){
+				echo $email;
+				echo " ";
+			}
+			echo "</font>";
+		}	
+	?>
 
 	</br><a href='<?php echo base_url()?>index.php/site/do_logout'>Logout</a>
 

@@ -14,6 +14,7 @@ class Site extends CI_Controller {
 
 	public function home(){
 		$data['title'] = "BillSplitter Collection";
+		//$data['emails_array_invalid'] = $emails_array_invalid;
 		$data['options'] = array(
 			'select' => 'Select One',
 			'friend1' => 'Evan',
@@ -276,18 +277,30 @@ class Site extends CI_Controller {
 	function addPermissions(){
 		$collectionId = $this->input->post('collectionId');
 		$emails_csv = $this->input->post('emails');
-		$emails_array_dup = str_getcsv($emails_csv); //create array
-		foreach($emails_array_dup as $row){
-			trim($row);
-		} //DOESN'T WORK YET trims off white space from entries
-		$emails_array = array_unique($emails_array_dup); //removes duplicates
+		$emails_array = str_getcsv($emails_csv); //create array
+		$emails_array = array_filter(array_map('trim', $emails_array)); //trims off white space from entries
+		$emails_array = array_unique($emails_array); //removes duplicates
+		$emails_array_valid = array();
+		$emails_array_invalid = array();
+		//validate each email address
+		foreach($emails_array as $email){
+			if(filter_var($email, FILTER_VALIDATE_EMAIL)) {
+	        	// valid address
+   				$emails_array_valid[] = $email;
+   			}
+    		else {
+        		// invalid address
+    			$emails_array_invalid[] = $email;
+    		}
+		}
+		//enter invalid emails into session flashdata to be displayed
+		$this->session->set_flashdata('emails_array_invalid',$emails_array_invalid);
+		//add permissions for valid emails
 		$this->load->model('permissions_db');
-		//currently can only accept 1 entry in the input - later will accept multiple, and then eventually emails only
-		foreach($emails_array as $row){
+		foreach($emails_array_valid as $row){
 			$this->permissions_db->addCollectionIdPermissionForUser($collectionId, $row);
 		}
-		redirect('site/home');	
-		//$this->home();
+		redirect('site/home');
 	}
 
 	}
