@@ -2,8 +2,21 @@
 <html>
 <head>
 	<title><?php echo $title; ?></title>
-
+	<script src="<?php echo base_url(); ?>/jquery-1.8.3.min.js"></script>
 	<script>
+		$(document).ready(function(){
+			$('#addPermissionsButton').click(function(){
+				var button = $(this);
+				$.post("addPermissions2", {origin: "home"}, function(data){
+					var awesomeText = document.createTextNode(data);
+					button.after(awesomeText);
+					console.log(awesomeText);
+				});
+			});
+		});
+
+
+
 		<!--
 			/*window.onload = function() {
 
@@ -101,10 +114,11 @@
 
 	<p><b>Share this Collection with friends:</b></p>
 	<?php 
-		echo form_open('site/addPermissions', '', array('collectionId' => $this->session->userdata('collectionId'), 'origin' => 'home'));
-		echo form_input(array('name' => 'emails', 'value' => 'Enter Email(s) Separated by Commas', 'style' => 'width:300px'));
-		echo form_submit('addPermissions', 'Share');
-		echo form_close();
+		//echo form_open('site/addPermissions', '', array('collectionId' => $this->session->userdata('collectionId'), 'origin' => 'home'));
+		echo form_input(array('id' => 'addPermissionsInput', 'name' => 'emails', 'value' => 'Enter Email(s) Separated by Commas', 'style' => 'width:300px'));
+		echo form_button(array('id' => 'addPermissionsButton', 'content' => 'Share'));
+		//echo form_submit('addPermissions', 'Share');
+		//echo form_close();
 	?>
 	<?php
 		if($this->session->flashdata('emails_array_invalid') != NULL){

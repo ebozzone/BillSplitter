@@ -13,6 +13,8 @@ class Site extends CI_Controller {
 	}
 
 	public function home(){
+		$this->load->helper('url');
+
 		$data['title'] = "BillSplitter Collection";
 		//$data['emails_array_invalid'] = $emails_array_invalid;
 		$data['options'] = array(
@@ -322,6 +324,10 @@ class Site extends CI_Controller {
 			$this->permissions_db->addCollectionIdPermissionForUser($collectionId, $row);
 		}
 		redirect('site/' . $origin);
+	}
+
+	function addPermissions2(){
+		echo "Awesome, this thing worked.";
 	}
 
 	function removePermission(){
