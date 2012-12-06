@@ -268,6 +268,9 @@ class Site extends CI_Controller {
 
     function linkCollection(){
     	$this->session->set_userdata('collectionId', $this->input->get('collectionId'));
+    	$this->load->model("permissions_db");
+    	$collectionName = $this->permissions_db->getCollectionName($this->session->userdata('collectionId'));
+    	$this->session->set_userdata('collectionName', $collectionName[0]['collectionName']);
     	$this->home();
     }
 
@@ -283,6 +286,7 @@ class Site extends CI_Controller {
 		$this->load->model('permissions_db');
 		$newCollectionId = $this->collectionidmanager->generateNewCollectionId();
 		$this->permissions_db->addCollectionIdPermissionForUser($newCollectionId, $this->session->userdata('username')	);
+		$this->permissions_db->newCollectionName($newCollectionId);
 		$this->session->set_userdata('collectionId', $newCollectionId);
 		$this->home();
 	}

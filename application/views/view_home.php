@@ -48,7 +48,8 @@
 <div id="container">
 	<h1>Welcome to BillSplitter, <?php echo $this->session->userdata('username') ?>!</h1>
 	
-		<a href='<?php echo base_url()?>index.php/site/collectionsList'>Back to List of Collections</a>
+	<h2><?php echo $this->session->userdata('collectionName') ?></h2>	
+	<a href='<?php echo base_url()?>index.php/site/collectionsList'>Back to List of Collections</a>
 
 	</br>
 	</br>

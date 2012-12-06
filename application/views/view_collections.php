@@ -32,8 +32,8 @@
 				$contributors = $this->permissions_db->getUsersWithPermission($row->collectionId);
 				
 				echo "<tr>";
-				echo "<td> <a href='" . base_url() . "index.php/site/linkCollection?collectionId=" . $row->collectionId . "'>Link to Collection ID # " . $row->collectionId . "</a> </td>";
-				echo "<td> Some Date </td>";
+				echo "<td> <a href='" . base_url() . "index.php/site/linkCollection?collectionId=" . $row->collectionId . "'>" . $row->collectionName . "</a> </td>";
+				echo "<td>" . date("F j, Y", strtotime($row->creationDate)) . "</td>";
 				echo "<td> [List Names on Collection's Columns] </td>";
 				echo "<td>";
 					foreach($contributors as $i=>$contributor){
