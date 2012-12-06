@@ -5,6 +5,10 @@
 	<title>BillSplitter Login Screen | Welcome </title>
 </head>
 <body>
+	<div>
+		<a href='<?php echo site_url('login/createCollectionNoLogin');?>'>Start A New Collection Without Logging In</a>
+	</div>
+
 	<div id='login_form'>
 		<form action='<?php echo base_url();?>index.php/login/process' method='post' name='process'>
 			<h2>User Login</h2>
@@ -18,6 +22,8 @@
 		
 			<input type='Submit' value='Login' />			
 		</form>
+		<a href='<?php echo site_url('login/forgotPassword');?>'>Forgot Password</a>
+		</br>
 		<a href='<?php echo site_url('login/createAccount');?>'>Create Account</a>
 	</div>
 </body>

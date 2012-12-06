@@ -46,10 +46,28 @@
 <body>
 
 <div id="container">
-	<h1>Welcome to BillSplitter, <?php echo $this->session->userdata('username') ?>!</h1>
+	<h1>Welcome to BillSplitter, <?php 
+		if($this->session->userdata('username') == NULL){
+			echo "Homey";
+		}
+		else{
+			echo $this->session->userdata('username'); 
+		}
+	?>! </h1>
 	
 	<h2><?php echo $this->session->userdata('collectionName') ?></h2>	
-	<a href='<?php echo base_url()?>index.php/site/collectionsList'>Back to List of Collections</a>
+	
+
+	<?php 
+		if($this->session->userdata('username') == NULL){
+			echo "<a href='" . base_url() . "index.php/login/createAccount'>Save this collection for later</a>";
+		}
+		else{
+			echo "<a href='" . base_url() . "index.php/site/collectionsList'>Back to List of Collections</a>";
+		}
+	?>
+
+	
 
 	</br>
 	</br>

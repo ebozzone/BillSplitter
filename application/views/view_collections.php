@@ -17,7 +17,7 @@
 	
 	<table border="1" cellpadding="1" cellspacing="1" summary="Collections Table">
 		<tr>
-			<th>Name of Collection of Bills</th>
+			<th>Collections of Bills</th>
 			<th>Date Created</th>
 			<th>People Splitting the Bill</th>
 			<th>Contributors</th>

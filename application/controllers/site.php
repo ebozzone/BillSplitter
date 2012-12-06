@@ -15,6 +15,11 @@ class Site extends CI_Controller {
 	public function home(){
 		$this->load->helper('url');
 
+		//put name of collection into session data
+    	$this->load->model("permissions_db");
+    	$collectionName = $this->permissions_db->getCollectionName($this->session->userdata('collectionId'));
+    	$this->session->set_userdata('collectionName', $collectionName[0]['collectionName']);
+
 		$data['title'] = "BillSplitter Collection";
 		//$data['emails_array_invalid'] = $emails_array_invalid;
 		$data['options'] = array(
@@ -268,9 +273,6 @@ class Site extends CI_Controller {
 
     function linkCollection(){
     	$this->session->set_userdata('collectionId', $this->input->get('collectionId'));
-    	$this->load->model("permissions_db");
-    	$collectionName = $this->permissions_db->getCollectionName($this->session->userdata('collectionId'));
-    	$this->session->set_userdata('collectionName', $collectionName[0]['collectionName']);
     	$this->home();
     }
 
