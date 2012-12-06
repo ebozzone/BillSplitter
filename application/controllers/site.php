@@ -4,7 +4,7 @@ class Site extends CI_Controller {
 
 	function __construct(){
         parent::__construct();
-        $this->check_isvalidated();
+        //$this->check_isvalidated();
     }
 
 	public function index() {
@@ -54,6 +54,21 @@ class Site extends CI_Controller {
 
 		//pass it to the corresponding view
 		$this->load->view("view_collections", $data);
+	}
+
+	//links to "Edit Permissions" page
+	public function permissionsList(){
+		$data['title'] = "Edit Permissions";
+		
+		//load the users corresponding to the collectionId
+		$this->load->model("permissions_db");
+    	$data['permissions'] = $this->permissions_db->getUsersWithPermission($this->session->userdata('collectionId'));
+
+		//load codeigniter helpers
+		$this->load->helper('form');
+
+		//pass it to the corresponding view
+		$this->load->view("view_permissions", $data);
 	}
 
 	function addBill(){
@@ -249,9 +264,14 @@ class Site extends CI_Controller {
     	return $result;
     }
 
-    function dashboardLink(){
+    function linkCollection(){
     	$this->session->set_userdata('collectionId', $this->input->get('collectionId'));
     	$this->home();
+    }
+
+    function linkPermissions(){
+    	$this->session->set_userdata('collectionId', $this->input->get('collectionId'));
+    	$this->permissionsList();
     }
 
     //Collection Management
@@ -275,6 +295,7 @@ class Site extends CI_Controller {
 
 	//Adds input email addresses to permissions table for given collectionId and sends invitation emails
 	function addPermissions(){
+		$origin = $this->input->post('origin');
 		$collectionId = $this->input->post('collectionId');
 		$emails_csv = $this->input->post('emails');
 		$emails_array = str_getcsv($emails_csv); //create array
@@ -300,7 +321,15 @@ class Site extends CI_Controller {
 		foreach($emails_array_valid as $row){
 			$this->permissions_db->addCollectionIdPermissionForUser($collectionId, $row);
 		}
-		redirect('site/home');
+		redirect('site/' . $origin);
+	}
+
+	function removePermission(){
+		$username = $this->input->post('userToRemove');
+		$this->load->model("permissions_db");
+		$this->permissions_db->removePermissionForUser($this->session->userdata('collectionId'), $username);
+		//$this->home();
+		redirect('site/permissionsList');	
 	}
 
 	}

@@ -19,6 +19,7 @@ class Permissions_db extends CI_Model{
 		$this->db->delete("permissions", array('collectionId' => $collectionId, 'username' => $username));
 	}
 
+	//return an array of usernames that have access to a certain collectionId
 	function getUsersWithPermission($collectionId){
 		$query = $this->db->query("SELECT username FROM permissions WHERE collectionId = '".$collectionId."'");
 		return $query->result();

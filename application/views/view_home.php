@@ -101,7 +101,7 @@
 
 	<p><b>Share this Collection with friends:</b></p>
 	<?php 
-		echo form_open('site/addPermissions', '', array('collectionId' => $this->session->userdata('collectionId')));
+		echo form_open('site/addPermissions', '', array('collectionId' => $this->session->userdata('collectionId'), 'origin' => 'home'));
 		echo form_input(array('name' => 'emails', 'value' => 'Enter Email(s) Separated by Commas', 'style' => 'width:300px'));
 		echo form_submit('addPermissions', 'Share');
 		echo form_close();
