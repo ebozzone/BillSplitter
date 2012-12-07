@@ -21,16 +21,20 @@ class Site extends CI_Controller {
     	$this->session->set_userdata('collectionName', $collectionName[0]['collectionName']);
 
 		$data['title'] = "BillSplitter Collection";
-		//$data['emails_array_invalid'] = $emails_array_invalid;
-		$data['options'] = array(
-			'select' => 'Select One',
-			'friend1' => 'Evan',
-			'friend2' => 'Manu',
-			'friend3' => 'Jon',
-			'friend4' => 'Dave',
-			'friend5' => 'Mary',
-			);
-		//load codeigniter helpers
+//		$data['options'] = array(
+//			'select' => 'Select One',
+//			'friend1' => 'Evan',
+//			'friend2' => 'Manu',
+//			'friend3' => 'Jon',
+//			'friend4' => 'Dave',
+//			'friend5' => 'Mary',
+//			);
+		
+		$data['options'] = array();
+		for($i = 1; $i < 16; $i++){
+			$friendName = 'friend'.$i;
+			$data['options'][$friendName] = 'TBD';
+		}
 		$this->load->helper('form');
 		$this->load->model("get_db");
 		//load table of bills for user into an array
@@ -89,6 +93,16 @@ class Site extends CI_Controller {
 		$friend3 = $this->input->post('friend3');
 		$friend4 = $this->input->post('friend4');
 		$friend5 = $this->input->post('friend5');
+		$friend6 = $this->input->post('friend6');
+		$friend7 = $this->input->post('friend7');
+		$friend8 = $this->input->post('friend8');
+		$friend9 = $this->input->post('friend9');
+		$friend10 = $this->input->post('friend10');
+		$friend11 = $this->input->post('friend11');
+		$friend12 = $this->input->post('friend12');
+		$friend13 = $this->input->post('friend13');
+		$friend14 = $this->input->post('friend14');
+		$friend15 = $this->input->post('friend15');
 
 
 		$newRow = array(
@@ -97,11 +111,21 @@ class Site extends CI_Controller {
 			"item" => $item,//"Car Rental", 
 			"amount" => $amount,//"250", 
 			"name" => $this->tempNameForFriend($payer),//, 
-			"friend1" => $friend1,//"TRUE", 
-			"friend2" => $friend2,//"TRUE", 
-			"friend3" => $friend3,//"TRUE", 
-			"friend4" => $friend4,//"TRUE", 
-			"friend5" => $friend5//"TRUE"
+			"friend1" => $friend1, 
+			"friend2" => $friend2,
+			"friend3" => $friend3,
+			"friend4" => $friend4,
+			"friend5" => $friend5,
+			"friend6" => $friend6,
+			"friend7" => $friend7,
+			"friend8" => $friend8,
+			"friend9" => $friend9,
+			"friend10" => $friend10,
+			"friend11" => $friend11,
+			"friend12" => $friend12,
+			"friend13" => $friend13,
+			"friend14" => $friend14,
+			"friend15" => $friend15
 		);
 		$this->get_db->insertNewBill($newRow);
 		//$this->home();

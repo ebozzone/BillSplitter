@@ -78,7 +78,7 @@
 			<th>Amount</th>
 			<th>Payer</th>
 			<?php
-				for($i = 1; $i < 6; $i++){
+				for($i = 1; $i < 16; $i++){
 					$friendName = 'friend'.$i;
 					echo "<th>" . $options[$friendName] . "</th>";
 				}
@@ -98,6 +98,16 @@
 				echo "<td>" . form_checkbox(array('checked' => $row->friend3,'disabled' => 'disabled')) . "</td>";
 				echo "<td>" . form_checkbox(array('checked' => $row->friend4,'disabled' => 'disabled')) . "</td>";
 				echo "<td>" . form_checkbox(array('checked' => $row->friend5,'disabled' => 'disabled')) . "</td>";
+				echo "<td>" . form_checkbox(array('checked' => $row->friend6,'disabled' => 'disabled')) . "</td>";
+				echo "<td>" . form_checkbox(array('checked' => $row->friend7,'disabled' => 'disabled')) . "</td>";
+				echo "<td>" . form_checkbox(array('checked' => $row->friend8,'disabled' => 'disabled')) . "</td>";
+				echo "<td>" . form_checkbox(array('checked' => $row->friend9,'disabled' => 'disabled')) . "</td>";
+				echo "<td>" . form_checkbox(array('checked' => $row->friend10,'disabled' => 'disabled')) . "</td>";
+				echo "<td>" . form_checkbox(array('checked' => $row->friend11,'disabled' => 'disabled')) . "</td>";
+				echo "<td>" . form_checkbox(array('checked' => $row->friend12,'disabled' => 'disabled')) . "</td>";
+				echo "<td>" . form_checkbox(array('checked' => $row->friend13,'disabled' => 'disabled')) . "</td>";
+				echo "<td>" . form_checkbox(array('checked' => $row->friend14,'disabled' => 'disabled')) . "</td>";
+				echo "<td>" . form_checkbox(array('checked' => $row->friend15,'disabled' => 'disabled')) . "</td>";
 				echo "<td>" . form_open('site/deleteItem', '', array('rowId' => $row->billId)) . form_submit('deleteRow', 'Delete!') .  form_close() . "</td>";
 				//echo "<td>" . form_button(array('name' => 'deleteRow', 'id' => 'deleteRow'.$index, 'content' => 'Delete', 'class' => 'deleteButton')) . "</td>";
 				echo "</tr>";
@@ -117,6 +127,16 @@
 			<td><?php echo form_checkbox('friend3', 1, TRUE); ?></td>
 			<td><?php echo form_checkbox('friend4', 1, TRUE); ?></td>
 			<td><?php echo form_checkbox('friend5', 1, TRUE); ?></td>
+			<td><?php echo form_checkbox('friend6', 1, TRUE); ?></td>
+			<td><?php echo form_checkbox('friend7', 1, TRUE); ?></td>
+			<td><?php echo form_checkbox('friend8', 1, TRUE); ?></td>
+			<td><?php echo form_checkbox('friend9', 1, TRUE); ?></td>
+			<td><?php echo form_checkbox('friend10', 1, TRUE); ?></td>
+			<td><?php echo form_checkbox('friend11', 1, TRUE); ?></td>
+			<td><?php echo form_checkbox('friend12', 1, TRUE); ?></td>
+			<td><?php echo form_checkbox('friend13', 1, TRUE); ?></td>
+			<td><?php echo form_checkbox('friend14', 1, TRUE); ?></td>
+			<td><?php echo form_checkbox('friend15', 1, TRUE); ?></td>
 		</tr>
 
 	</table>
