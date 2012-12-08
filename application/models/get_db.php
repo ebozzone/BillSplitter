@@ -10,6 +10,11 @@ class Get_db extends CI_Model{
 		$this->db->insert("billsummary", $data);
 	}
 
+	function updateBill($collectionId, $billId, $columnName, $value)
+	{
+		$query = $this->db->query("UPDATE billsummary SET ".$columnName." = '".$value."' WHERE collectionId = '".$collectionId."' AND billId = '".$billId."'");
+	}
+
 	function emptyTable($table){
 		$this->db->truncate($table);
 	}

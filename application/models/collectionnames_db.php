@@ -5,14 +5,28 @@ class Collectionnames_db extends CI_Model{
 	function newCollectionName($collectionId){
 		$data = array(
 				'collectionId' => $collectionId,
-				'collectionName' => "New Collection"
+				'collectionName' => "New Collection",
+				'friend1' => "Me",
+				'friend2' => "Friend 1",
+				'friend3' => "Friend 2"
 			);
 		$this->db->insert("collectionnames", $data);
 	}
 
+	function updateCollectionName($collectionId, $newName)
+	{
+		$query = $this->db->query("UPDATE collectionNames SET collectionName = '".$newName."' WHERE collectionId = '".$collectionId."'");	
+	}
+
+
 	function getCollectionData($collectionId){
 		$query = $this->db->query("SELECT * FROM collectionnames WHERE collectionId = '".$collectionId."'");
 		return $query->result_array();
+	}
+
+	function updateFriendName($collectionId, $index, $newName)
+	{
+		$query = $this->db->query("UPDATE collectionNames SET friend".$index." = '".$newName."' WHERE collectionId = '".$collectionId."'");
 	}
 
 	function addColumnToCollection($collectionId, $friendName)

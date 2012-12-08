@@ -59,7 +59,49 @@ class Site extends CI_Controller {
 		//echo "</br>"."amounts paid:"."</br>";
 		//print_r($amountsPaid);
 		$this->load->view("view_home", $data);
+	}
+
+	public function loadTable(){
+		$this->load->helper('url');
+		//put name of collection into session data
+    	$this->load->model("permissions_db");
+    	$this->load->model("collectionnames_db");
+    	$collectionData = $this->collectionnames_db->getCollectionData($this->session->userdata('collectionId'));
+    	$this->session->set_userdata('collectionName', $collectionData[0]['collectionName']);
+    	$this->session->set_userdata('collectionData', $collectionData);
+
+		$data['title'] = "BillSplitter Collection";
+		
+		//load friend names into 'options'
+		$numFriends = $collectionData[0]['friendCount']; // refers to the single row containing metadata about the collection
+
+		$data['friends'] = array();
+		for($i = 1; $i < $numFriends + 1; $i++){
+			$friendName = 'friend'.$i;
+			$data['friends'][$friendName] = $collectionData[0]['friend'.$i];
 		}
+		$data['numFriends'] = $numFriends;
+		$this->load->helper('form');
+		$this->load->model("get_db");
+		//load table of bills for user into an array
+		//$data['results'] = $this->get_db->getAll($this->collectionIdForUser());
+		$data['results'] = $this->get_db->getAll($this->session->userdata('collectionId'));
+		//do the math on who paid, and is owed
+		//$data['contributions'] = $this->calculateContributionRows($data['results']);
+		//$data['amountsOwed'] = $this->calculateAmountsOwed($data['contributions'], $data['results']);
+		//$data['amountsPaid'] = $this->calculateAmountsPaid($data['results']);
+		//echo "results:"."</br>";
+		//print_r($data['results']);
+		//echo "</br>"."contributions:"."</br>";
+		//print_r($contributions);
+		//echo "</br>"."amounts owed:"."</br>";
+		//print_r($amountsOwed);
+		//echo "</br>"."amounts paid:"."</br>";
+		//print_r($amountsPaid);
+		//print_r($data);
+		print_r (json_encode($data));
+		//$this->load->view("view_home", $data);
+	}
 
 	public function collectionsList(){
 		$data['title'] = "BillSplitter Dashboard";
@@ -155,6 +197,16 @@ class Site extends CI_Controller {
 		redirect('site/home');	
 	}
 
+	function updateFriendName(){
+		$this->load->model('collectionnames_db');
+		$index = $this->input->post('friendId');
+		$newName = $this->input->post('newName');
+		$index++;
+		echo $newName;
+		echo $index;
+		$this->collectionnames_db->updateFriendName($this->session->userdata('collectionId'), $index, $newName);
+	}
+
 	function emptyBill(){
 		$this->load->model("get_db");
 
@@ -226,13 +278,66 @@ class Site extends CI_Controller {
 
 	}
 
+	function updateItem(){
+		//we get the item from the post
+		$billId = $this->input->post('billId');
+		$newItem = $this->input->post('newItem');
+
+		//load database
+		$this->load->model("get_db");
+
+		//make database update of item
+		$this->get_db->updateBill($this->session->userdata('collectionId'), $billId, 'item', $newItem);
+	}
+
+	function updateAmount(){
+		//we get the item from the post
+		$billId = $this->input->post('billId');
+		$newAmount = $this->input->post('newAmount');
+
+		//load database
+		$this->load->model("get_db");
+
+		//make database update of item
+		$this->get_db->updateBill($this->session->userdata('collectionId'), $billId, 'amount', $newAmount);
+	}
+
+	function updatePayer(){
+		//we get the item from the post
+		$billId = $this->input->post('billId');
+		$newPayer = $this->input->post('newPayer');
+
+		//load database
+		$this->load->model("get_db");
+
+		//make database update of item
+		$this->get_db->updateBill($this->session->userdata('collectionId'), $billId, 'name', $newPayer);
+	}
+
+	function updateCheckbox(){
+		//we get the item from the post
+		$billId = $this->input->post('billId');
+		$newCheck = $this->input->post('newCheck');
+		$friendId = $this->input->post('friendId');
+		$friendId++;
+		$columnName = "friend".$friendId;
+		echo $columnName;
+
+		//load database
+		$this->load->model("get_db");
+
+		//make database update of item
+		$this->get_db->updateBill($this->session->userdata('collectionId'), $billId, $columnName, $newCheck);
+	}
+
 	function calculateContributionRows($resultsData) {
 		$contributions = array();
 		foreach($resultsData as $index=>$row) {
 			$contributionsRow = array();
 			$numfriends = $row->friend1 + $row->friend2 + $row->friend3 + $row->friend4 + $row->friend5;
 			$itemCost = $row->amount;
-			$individualContribution = $itemCost / $numfriends;
+			if ($numfriends == 0) $individualContribution = 0;
+			else $individualContribution = $itemCost / $numfriends;
 			$contributionsRow['friend1'] = 0;
 			$contributionsRow['friend2'] = 0;
 			$contributionsRow['friend3'] = 0;
@@ -285,6 +390,23 @@ class Site extends CI_Controller {
 		//return the sums
 		return $amountsPaid;
 
+	}
+
+	function changeCollectionName() {
+		$this->load->helper('text');
+		$newCollectionName = $this->input->post('newCollectionName');
+		$newCollectionName = ascii_to_entities($newCollectionName);
+
+		$this->load->model('collectionnames_db');
+		$this->collectionnames_db->updateCollectionName($this->session->userdata('collectionId'), $newCollectionName);
+		$collectionData = $this->collectionnames_db->getCollectionData($this->session->userdata('collectionId'));
+    	echo $collectionData[0]['collectionName'];
+	}
+
+	function collectionName() {
+		$this->load->model("collectionnames_db");
+    	$collectionData = $this->collectionnames_db->getCollectionData($this->session->userdata('collectionId'));
+    	echo $collectionData[0]['collectionName'];
 	}
 
 	//Login Related Stuff
