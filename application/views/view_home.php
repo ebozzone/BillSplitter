@@ -71,6 +71,8 @@
 
 	</br>
 	</br>
+
+	<?php print_r($friends); ?>
 	
 	<table border="1" cellpadding="1" cellspacing="1" summary="Bill Splitting Table">
 		<tr>
@@ -78,9 +80,13 @@
 			<th>Amount</th>
 			<th>Payer</th>
 			<?php
-				for($i = 1; $i < 16; $i++){
+				for($i = 1; $i < $numFriends + 1; $i++){
 					$friendName = 'friend'.$i;
-					echo "<th>" . $options[$friendName] . "</th>";
+					echo "<th>" . $friends[$friendName] . "</th>";
+				}
+				for($i = $numFriends + 1; $i < 16; $i++){
+					$friendName = 'friend'.$i;
+					echo "<th>" . $friendName . "</th>";
 				}
 			?>
 			<th>Actions</th>
@@ -93,8 +99,9 @@
 				echo "<td>" . $row->item . "</td>";
 				echo "<td>" . $row->amount . "</td>";
 				echo "<td>" . $row->name . "</td>";
+
 				echo "<td>" . form_checkbox(array('checked' => $row->friend1,'disabled' => 'disabled')) . "</td>";
-				echo "<td>" . form_checkbox(array('checked' => $row->friend2,'disabled' => 'disabled')) . "</td>";
+				echo "<td>" . form_checkbox(array(	'checked' => $row->friend2,'disabled' => 'disabled')) . "</td>";
 				echo "<td>" . form_checkbox(array('checked' => $row->friend3,'disabled' => 'disabled')) . "</td>";
 				echo "<td>" . form_checkbox(array('checked' => $row->friend4,'disabled' => 'disabled')) . "</td>";
 				echo "<td>" . form_checkbox(array('checked' => $row->friend5,'disabled' => 'disabled')) . "</td>";
@@ -121,7 +128,15 @@
 			echo form_open('site/addBill'); ?> 
 			<td><?php echo form_input(array('name' => 'item', 'value' => 'Item', 'autofocus' => 'autofocus')); ?></td>
 			<td><?php echo form_input('amount', 'Amount'); ?></td>
-			<td><?php echo form_dropdown('payers', $options, ''); ?></td>
+			<td><?php 
+				$dropdownValues = array();
+				for ($l = 0; $l < $numFriends; $l++) {
+					$friendName = 'friend'.($l+1);
+					$dropdownValues[$l] = $friends[$friendName];
+				}
+				echo form_dropdown('payers', $dropdownValues, ''); 
+				//echo form_dropdown('payers', $friends, ''); 
+			?></td>
 			<td><?php echo form_checkbox('friend1', 1, TRUE); ?></td>
 			<td><?php echo form_checkbox('friend2', 1, TRUE); ?></td>
 			<td><?php echo form_checkbox('friend3', 1, TRUE); ?></td>
@@ -149,6 +164,26 @@
 		//echo form_open('site/emptyBill');
 		//echo form_submit('emptyBillSubmit', 'Empty Table');
 		//echo form_close();
+	?>
+
+	<?php
+		echo form_open('site/addColumn');
+		echo form_input('newColumnName', "Friend's Name");
+		echo form_submit('newColumnSubmit', 'Submit Column!'); 
+		echo form_close();
+	?>
+
+	<?php
+		echo form_open('site/deleteColumn');
+
+		$columnDropdownValues = array();
+		for ($m = 0; $m < $numFriends; $m++) {
+			$friendName = 'friend'.($m+1);
+			$columnDropdownValues[$m] = $friends[$friendName];
+		}
+		echo form_dropdown('friendToDelete', $dropdownValues, ''); 
+		echo form_submit('newColumnSubmit', 'Delete Friend'); 
+		echo form_close();
 	?>
 
 	<p><b>Share this Collection with friends:</b></p>
@@ -182,7 +217,7 @@
 			for($i = 1; $i < 6; $i++){
 				$friendName = 'friend'.$i;
 				$discrepancy = $amountsOwed[$friendName] - $amountsPaid[$friendName];
-				echo "<li> " . $options[$friendName] . " paid $" . $amountsPaid[$friendName] . " and his share of the expenses is $" . $amountsOwed[$friendName] . ". He owes <b>$" . $discrepancy . "</b>.</li>";				
+				echo "<li> " . $friends[$friendName] . " paid $" . $amountsPaid[$friendName] . " and his share of the expenses is $" . $amountsOwed[$friendName] . ". He owes <b>$" . $discrepancy . "</b>.</li>";				
 			}
 		?>
 	</ul>

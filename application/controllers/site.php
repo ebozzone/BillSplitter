@@ -17,8 +17,10 @@ class Site extends CI_Controller {
 
 		//put name of collection into session data
     	$this->load->model("permissions_db");
-    	$collectionName = $this->permissions_db->getCollectionName($this->session->userdata('collectionId'));
-    	$this->session->set_userdata('collectionName', $collectionName[0]['collectionName']);
+    	$this->load->model("collectionnames_db");
+    	$collectionData = $this->collectionnames_db->getCollectionData($this->session->userdata('collectionId'));
+    	$this->session->set_userdata('collectionName', $collectionData[0]['collectionName']);
+    	$this->session->set_userdata('collectionData', $collectionData);
 
 		$data['title'] = "BillSplitter Collection";
 //		$data['options'] = array(
@@ -30,11 +32,15 @@ class Site extends CI_Controller {
 //			'friend5' => 'Mary',
 //			);
 		
-		$data['options'] = array();
-		for($i = 1; $i < 16; $i++){
+		//load friend names into 'options'
+		$numFriends = $collectionData[0]['friendCount'];
+
+		$data['friends'] = array();
+		for($i = 1; $i < $numFriends + 1; $i++){
 			$friendName = 'friend'.$i;
-			$data['options'][$friendName] = 'TBD';
+			$data['friends'][$friendName] = $collectionData[0]['friend'.$i];
 		}
+		$data['numFriends'] = $numFriends;
 		$this->load->helper('form');
 		$this->load->model("get_db");
 		//load table of bills for user into an array
@@ -84,6 +90,7 @@ class Site extends CI_Controller {
 
 	function addBill(){
 		$this->load->model("get_db");
+		//$this->load->model("collectionnames_db");
 
 		$item = $this->input->post('item');
 		$amount = $this->input->post('amount');
@@ -104,13 +111,14 @@ class Site extends CI_Controller {
 		$friend14 = $this->input->post('friend14');
 		$friend15 = $this->input->post('friend15');
 
+		$sessionCollectionData = $this->session->userdata('collectionData');
 
 		$newRow = array(
 			"collectionId" => $this->session->userdata('collectionId'),
 			"billId" => time(), 
 			"item" => $item,//"Car Rental", 
 			"amount" => $amount,//"250", 
-			"name" => $this->tempNameForFriend($payer),//, 
+			"name" => $payer,//$sessionCollectionData[0][$payer],//$this->tempNameForFriend($payer),//, 
 			"friend1" => $friend1, 
 			"friend2" => $friend2,
 			"friend3" => $friend3,
@@ -130,6 +138,21 @@ class Site extends CI_Controller {
 		$this->get_db->insertNewBill($newRow);
 		//$this->home();
 		redirect('site/home');
+	}
+
+	function addColumn(){
+		$name = $this->input->post('newColumnName');
+		$this->load->model('collectionnames_db');
+		$this->collectionnames_db->addColumnToCollection($this->session->userdata('collectionId'), $name);
+		redirect('site/home');
+	}
+
+	function deleteColumn(){
+		$friendIndexToDelete = $this->input->post('friendToDelete');
+		$this->load->model('collectionnames_db');
+		//$friendIndexToDelete++;
+		$this->collectionnames_db->deleteFriendColumnFromCollection($this->session->userdata('collectionId'), $friendIndexToDelete);
+		redirect('site/home');	
 	}
 
 	function emptyBill(){
@@ -310,9 +333,10 @@ class Site extends CI_Controller {
 	function createNewCollectionForUser(){
 		$this->load->library('collectionIdManager');
 		$this->load->model('permissions_db');
+		$this->load->model('collectionnames_db');
 		$newCollectionId = $this->collectionidmanager->generateNewCollectionId();
 		$this->permissions_db->addCollectionIdPermissionForUser($newCollectionId, $this->session->userdata('username')	);
-		$this->permissions_db->newCollectionName($newCollectionId);
+		$this->collectionnames_db->newCollectionName($newCollectionId);
 		$this->session->set_userdata('collectionId', $newCollectionId);
 		$this->home();
 	}

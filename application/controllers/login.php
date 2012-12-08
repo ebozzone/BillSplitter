@@ -45,6 +45,7 @@ class Login extends CI_Controller{
 	function processCreateAccount(){
 		$this->load->model('login_model');
 		$this->load->model('permissions_db');
+		$this->load->model('collectionnames_db');
 		$message = NULL;
 		//get username and password from form post
 		$username = $this->security->xss_clean($this->input->post('username'));
@@ -78,7 +79,7 @@ class Login extends CI_Controller{
 				//create a first collection for this user
 				$this->load->library('collectionIdManager');
 				$newCollectionId = $this->collectionidmanager->generateNewCollectionId();
-				$this->permissions_db->newCollectionName($newCollectionId);
+				$this->collectionnames_db->newCollectionName($newCollectionId);
 				$this->permissions_db->addCollectionIdPermissionForUser($newCollectionId, $username);	
 			}
 			
@@ -134,7 +135,8 @@ class Login extends CI_Controller{
 		$this->load->library('collectionIdManager');
 		$newCollectionId = $this->collectionidmanager->generateNewCollectionId();
 		$this->load->model('permissions_db');
-		$this->permissions_db->newCollectionName($newCollectionId);
+		$this->load->model('collectionnames_db');
+		$this->collectionnames_db->newCollectionName($newCollectionId);
 		$this->session->set_userdata('collectionId', $newCollectionId);
 		redirect('site/home');
 	}
