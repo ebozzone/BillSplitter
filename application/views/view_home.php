@@ -5,17 +5,26 @@
 		
 		//edit this to accept an argument whether to change the focus or not
 
-		//select global variables
+		//create limited set of global variables
 		var global_numFriends;
+		//local model contains all table data
 		var localModel = {}; 
+
+		//contains results of expense calculations
 		var amountsOwed = new Array();
 		var amountsPaid = new Array();
-		var showingTable = -1;
-		//have itemizedArray of Item / Share / Owed (LATER)
+		//stores list of itemized tables; use: itemizedArray[friendNumber]['item'][rowNumber]
 		var itemizedArray = new Array();
 
+		//stores state of itemized table that is being displayed
+		var showingTable = -1;
+	
+		
+		//loads the name of the collection into a 1x1 cell table
+		//does this to support real-time ajax based updating of the name 
 		function loadCollectionName(strHolderId, collectionName)
 		{
+			//create 1x1 cell table
 			var nameTable, ntbody, nRow, nCell;
 			nameTable = document.createElement('table');
 			nameTable.id = "collectionNameTable";
@@ -31,11 +40,14 @@
 			nRow.appendChild(nCell);
 			ntbody.appendChild(nRow);
 
+			//append the new cell after deleting any old ones that exist
 			nameTable.appendChild(ntbody);
 			byId(strHolderId).innerHTML = "";
 			byId(strHolderId).appendChild(nameTable);
 		}
 
+		//function to load or reload the main expense calculation spreadsheet
+		//initiates ajax posts, and then calls makeTable2 after the asynchronous response is received
 		function makeTable(strParentId, focus)
 		{
 			if(typeof(focus)==='undefined') focus = true;
@@ -53,8 +65,12 @@
 			//loadCollectionName('collectionNameHolder', '<?php echo $this->session->userdata('collectionName') ?>');
 		}
 
+		//continuation of makeTable; this is the callback function after the post request
+		//builds the entire expense calculation spreadsheet, row by row and cell by cell. it's long.
 		function makeTable2(strParentId, data, focus)
 		{
+			// STEP 1: INITIALIZE VARIABLES
+			//------------------------------------------------
 			var table, tbody, curX, curY, curRow, curCell
 			table = document.createElement('table');
 			table.id = "itemsTable";
@@ -63,11 +79,11 @@
 			table.appendChild(tbody);
 			table.className = "table table-striped table-bordered table-condensed";
 
-			
-			//parse data object into the various arrays
+			// STEP 2: Parse the data object from the server, putting it into various arrays easy to digest for the table construction algorithm.
+			//------------------------------------------------
 
 			var tableData = $.parseJSON(data);
-			console.log(tableData);
+			//console.log(tableData);
 
 			//friendNamesArray
 			var friendsList = tableData['friends'];
@@ -117,12 +133,12 @@
 				}
 			}
 
-			console.log("Formatted Data Into Arrays:");
-			console.log(raw_billIdEntries); 
-			console.log(raw_itemEntries); 
-			console.log(raw_AmountEntries);
-			console.log(raw_payerEntries);
-			console.log(raw_checkboxes); 
+			//console.log("Formatted Data Into Arrays:");
+			//console.log(raw_billIdEntries); 
+			//console.log(raw_itemEntries); 
+			//console.log(raw_AmountEntries);
+			//console.log(raw_payerEntries);
+			//console.log(raw_checkboxes); 
 
 			//hardcoded
 			var headerNames = new Array("Item", "Amount", "Payer", "Me", "Friend1", "Friend2", "Friend3", "Friend4", "Friend5", "Friend6", "Friend7", "Friend8", "Friend9", "Friend10", "Friend11", "Friend12", "Friend13", "Friend14", "Friend15");
@@ -138,6 +154,10 @@
 			//other arrays
 			var entryNamesArray = new Array(itemEntries, amountEntries, payerEntries);			
 
+
+			// STEP 3: Begin Writing the Table in Javascript
+			//------------------------------------------------
+
 			//header
 			headerRow = document.createElement('tr');
 			headerRow.style.backgroundColor = "#C0D8F2";
@@ -148,7 +168,9 @@
 			var nextColumnDeleteButton;
 			var nameToSend;
 
-			//topRow (hidden)
+
+
+			//PART 1: HIDDEN TOP ROW WITH DELETE COLUMN BUTTONS
 			var topRow = document.createElement('tr');
 			var spanCell = document.createElement('td');
 			spanCell.setAttribute("colspan", "3");
@@ -171,7 +193,7 @@
 			topRow.id = "deleteColumnButtonsRow";
 			tbody.appendChild(topRow);
 
-			//header Row
+			//PART 2: HEADER ROW
 			for (i =0; i < friendNamesArray.length + 3; i++)
 			{
 				nextHeaderCell = document.createElement('td');
@@ -189,16 +211,6 @@
 					//nameToSend = friendNamesArray[i-2];
 					nextHeaderCell.onclick = function() {onHeaderClick(this, nameToSend);}
 					nextHeaderCell.id = (i - 3);
-
-					//column delete buttons
-					/*nextColumnDeleteButton = document.createElement('input');
-					nextColumnDeleteButton.type = "button";
-					nextColumnDeleteButton.value = "X";
-					nextColumnDeleteButton.className = "columnDeleteButton";
-					nextColumnDeleteButton.id = friendNamesArray[i-3];
-					nextColumnDeleteButton.hidden = true;
-					nextColumnDeleteButton.onclick = function() {deleteColumn(this);}
-					nextHeaderCell.appendChild(nextColumnDeleteButton);*/
 				}
 
 				headerRow.appendChild(nextHeaderCell);
@@ -211,7 +223,7 @@
 			//append the header to the body
 			tbody.appendChild(headerRow);
 
-			//body
+			//PART 3: BODY OF TABLE WITH ROW BY ROW ENTRIES
 			//ros
 			var nextCheckbox; 
 			var nextDropdown;
@@ -343,7 +355,7 @@
 				nextFormCheckbox.id = "checkboxForFriend"+m;
 				nextFormCheckbox.value = "friend"+m;
 				nextFormCheckbox.class = "formCheckbox";
-				console.log(nextFormCheckbox.id);
+				//console.log(nextFormCheckbox.id);
 				nextFormCheckbox.checked = true;
 				nextFormCheckbox.onkeyup = function(e){
 				if (e.keyCode == '13')
@@ -410,10 +422,13 @@
 		//---------------
 		//---------------
 
+		//Using the locally stored model on the client side, calculates what each friend owes
+		//puts its output into amountsPaid and amountsOwed for the results area
+		//and into itemizedArray for the itemized tables area
 		function runCalculation()
 		{
 			var numFriends = localModel['friendNamesArray'].length;
-			console.log("Num Friends: "+numFriends);
+			//console.log("Num Friends: "+numFriends);
 			var numRows = localModel['billIdEntries'].length;
 			itemizedArray = new Array();
 			
@@ -474,14 +489,15 @@
 				amountsPaid[payerNumber] = parseFloat(amountsPaid[payerNumber]) + parseFloat(localModel['amountEntries'][m]);
 			}
 
-			console.log("Amounts Owed, Paid:")
-			console.log(amountsOwed);
-			console.log(amountsPaid);
+			//console.log("Amounts Owed, Paid:")
+			//console.log(amountsOwed);
+			//console.log(amountsPaid);
 
 			updateResultsArea();
 
 		}
 
+		//uses the amountsPaid and amountsOwed arrays to display a summary table of how much each friend owes
 		function updateResultsArea()
 		{
 			var resultsTable = document.createElement('table');
@@ -533,22 +549,6 @@
 				nextCell.appendChild(document.createTextNode(textHolder));
 				nextRow.appendChild(nextCell);
 
-				//owes cell
-				//nextCell = document.createElement('td');
-				//nextCell.appendChild(document.createTextNode());
-				//nextRow.appendChild(nextCell);
-
-				//paid cell
-				//nextCell = document.createElement('td');
-				//textHolder = "But "+localModel['friendNamesArray'][i]+" paid:";
-				//nextCell.appendChild(document.createTextNode(textHolder));
-				//nextRow.appendChild(nextCell);
-
-				//paid cell
-				//nextCell = document.createElement('td');
-				//nextCell.appendChild(document.createTextNode(amountsPaid[i].toFixed(2)));
-				//nextRow.appendChild(nextCell);
-
 				//nextCell = document.createElement('td');
 				nextCell = document.createElement('td');
 				discrepancy = amountsOwed[i] - amountsPaid[i];
@@ -558,11 +558,6 @@
 				nextCell.className = "boldCell";
 				nextRow.appendChild(nextCell);
 
-				//paid cell
-				//nextCell = document.createElement('td');
-				//discrepancy = amountsOwed[i] - amountsPaid[i];
-				//nextCell.appendChild(document.createTextNode(discrepancy.toFixed(2)));
-				//nextRow.appendChild(nextCell);
 
 				//itemized button
 				nextCell = document.createElement('td');
@@ -594,10 +589,12 @@
 
 		}
 
+		//responds when a display detail button is clicked by determining the state of which itemized table should display
+		// showingTable = -1 means no table is displaying
 		function showItemizedForButton(itemizedDetailButton)
 		{
 			var numFriends = localModel['friendNamesArray'].length;
-			console.log("Detail Pressed "+itemizedDetailButton.id);
+			//console.log("Detail Pressed "+itemizedDetailButton.id);
 
 			for (var i = 0; i < numFriends; i++)
 			{
@@ -621,6 +618,8 @@
 			}
 		}
 
+		//uses itemizedArray to create a table for each friend involved in the collection
+		//produces these tables which are normally hidden, but displayed as necesarry
 		function updateItemizedTables() 
 		{
 			//give them each Ids itemizedTable1 etc
@@ -741,9 +740,11 @@
 			}
 		}
 
+		//triggers when a cell in the header is clicked, turning it temporarily into an input
+		//this function was largely taken from an online forum, where it was posted for public use
 		function onHeaderClick(clickedCell, placeText)
 		{
-			console.log("onHeaderClick called");
+			//console.log("onHeaderClick called");
 			var cellTxt = clickedCell.innerHTML;
 			var editBox = document.createElement('input');
 			editBox.value = cellTxt;
@@ -755,45 +756,46 @@
 			editBox.select();
 			editBox.onblur = function(){nameCellLoseFocus(this, cellTxt);}
 			editBox.onkeyup = function(e){
-				console.log("key is up:");
-				console.log(e.keyCode);
+				//console.log("key is up:");
+				//console.log(e.keyCode);
 				if (e.keyCode == '13')
 				{	
-					console.log("Enter Pressed");
+					//console.log("Enter Pressed");
 					nameCellLoseFocus(this, cellTxt);
 				}
 				if (e.keyCode == '27')
 				{
-					console.log("Escape Pressed");
+					//console.log("Escape Pressed");
 					escapeCell(this, cellTxt);
 				}
 			}
 		}
 
+		//triggers when a name cell that was clicked loses its focus
 		function nameCellLoseFocus(editedCell, previousText)
 		{
 			var cellTxt = editedCell.value;
 			
-			console.log("header cell's value is:"+editedCell.value);
+			//console.log("header cell's value is:"+editedCell.value);
 			parentNode = editedCell.parentNode;
 			editedCell.onblur = function() {return false;}
 			parentNode.removeChild(editedCell);
 			parentNode.appendChild( document.createTextNode(cellTxt) );
 			parentNode.onclick = function() {onHeaderClick(this);}
-			console.log("header focus lost");
+			//console.log("header focus lost");
 
 			//check if the new value is different from the old
 			if(cellTxt == previousText)
 			{
-				console.log("not sending anything to server, no change");
+				//console.log("not sending anything to server, no change");
 			}
 			else {
 				//it's different, so send the POST
-				console.log("posting because the name has changed for ID = "+parentNode.id);
+				//console.log("posting because the name has changed for ID = "+parentNode.id);
 
 				$.post("updateFriendName", { friendId: parentNode.id, newName: cellTxt }, function(data){
-					console.log("Updating:");
-					console.log(data);
+					//console.log("Updating:");
+					//console.log(data);
 					makeTable('tblHolder', false);
 				});
 
@@ -801,7 +803,9 @@
 				//makeTable('tblHolder');
 			}
 		}
-		
+
+		//triggers when a cell in the array is clicked, turning it temporarily into an input
+		//this function was largely taken from an online forum, where it was posted for public use
 		function onCellClick(clickedCell)
 		{
 			var cellTxt = clickedCell.innerHTML;
@@ -821,11 +825,11 @@
 			}
 
 			editBox.onkeyup = function(e){
-				console.log("key is up:");
-				console.log(e.keyCode);
+				//console.log("key is up:");
+				//console.log(e.keyCode);
 				if (e.keyCode == '13')
 				{	
-					console.log("Enter Pressed");
+					//console.log("Enter Pressed");
 					if (clickedCell.id == "collectionNameCell") {
 						onTitleLoseFocus(this);
 					} else {
@@ -835,22 +839,23 @@
 				}
 				if (e.keyCode == '27')
 				{
-					console.log("Escape Pressed");
+					//console.log("Escape Pressed");
 					escapeCell(this, cellTxt);
 				}
 			}
 		}
 
+		//triggers when the title, which has been clicked, loses focus 
 		function onTitleLoseFocus(editedCell)
 		{
 			var cellTxt = editedCell.value;
-			console.log("edited cell's value is:"+editedCell.value);
+			//console.log("edited cell's value is:"+editedCell.value);
 			parentNode = editedCell.parentNode;
 			editedCell.onblur = function() {return false;}
 			parentNode.removeChild(editedCell);
 			parentNode.appendChild( document.createTextNode(cellTxt) );
 			parentNode.onclick = function() {onCellClick(this);}
-			console.log("focus lost");
+			//console.log("focus lost");
 
 			//make a post changing the name of the title, update the name cell afterwards
 			$.post("changeCollectionName", { newCollectionName: editedCell.value.replace(/'/g, "\\'") }, function(data){
@@ -858,16 +863,17 @@
 				});
 		}
  
+ 		//triggers when a cell which has been clicked on, loses focus, turning it back into a cell
 		function onLoseFocus(editedCell)
 		{
 			var cellTxt = editedCell.value;
-			console.log("edited cell's value is:"+editedCell.value);
+			//console.log("edited cell's value is:"+editedCell.value);
 			parentNode = editedCell.parentNode;
 			editedCell.onblur = function() {return false;}
 			parentNode.removeChild(editedCell);
 			parentNode.appendChild( document.createTextNode(cellTxt) );
 			parentNode.onclick = function() {onCellClick(this);}
-			console.log("focus lost");
+			//console.log("focus lost");
 
 			//get the id of the row
 			var columnId = parentNode.id;
@@ -882,24 +888,21 @@
 				postUpdateOnAmount(cellTxt, rowId);
 			}
 
-			//if there's a change, post
-			
-			//upon success, reload
-			//add the argument to make sure focus is not set
-			//makeTable('tblHolder');
 		}
 
+		//handles when the user is editing a cell, but hits the escape key; restores the old value in the cell
 		function escapeCell(editedCell, previousText)
 		{
-			console.log(previousText);
+			//console.log(previousText);
 			parentNode = editedCell.parentNode;
 			editedCell.onblur = function(){return false;}
 			parentNode.removeChild(editedCell);
 			parentNode.appendChild(document.createTextNode(previousText));
 			parentNode.onclick = function() {onCellClick(this);}
-			console.log("escaped");
+			//console.log("escaped");
 		}
 
+		//handles ajax update to the server when a checkbox is changed
 		function checkboxChanged(checkbox) {
 
 			//figure out value
@@ -915,6 +918,7 @@
 			postUpdateOnCheckbox(value, friend, rowId);
 		}
 
+		//displays or hides the column delete buttons row
 		function toggleColumnDeleteButtons() 
 		{
 			//animated toggle of the column delete buttons 
@@ -929,13 +933,14 @@
 			}
 		}
 
+		//handles ajax update to the server when a column has been selected for deletion
 		function deleteColumn(deleteColumnButton)
 		{
 			//check if any of the entries in payerArray match the number deleteColumnButton.id, then give an alert
 
 			//otherwise, delete the column through POST
-			console.log("Delete the column:");
-			console.log(deleteColumnButton.id);
+			//console.log("Delete the column:");
+			//console.log(deleteColumnButton.id);
 
 			//toggle, then reload the table
 			toggleColumnDeleteButtons();
@@ -948,10 +953,10 @@
 			//makeTable('tblHolder');
 		}
 
-
+		//handles ajax update to the server when a new column is added
 		function addColumn()
 		{
-			console.log("Adding a column!");
+			//console.log("Adding a column!");
 			//makes a post to add a column
 
 			if (global_numFriends > 14) {
@@ -972,9 +977,11 @@
 					
 		}
 
+		//handles update to the server when a new row is added
+		//makes an ajax request 
 		function addRowFormSubmitPressed()
 		{
-			console.log("Form Submission was Hit!");
+			//console.log("Form Submission was Hit!");
 
 			var dataToSend = {};
 			dataToSend.item = document.getElementById('itemInput').value;
@@ -991,7 +998,7 @@
 				dataToSend['friend'+(d+1)] = checkValue;
 			}
 
-			console.log(dataToSend);
+			//console.log(dataToSend);
 			//post the new row to the server
 			$.post("addBill", dataToSend, function(data){
 					makeTable('tblHolder');
@@ -1001,10 +1008,11 @@
 			//makeTable('tblHolder');
 		}
 
+		//handles ajax update to the server when a row is selected for deletion 
 		function deleteRow(deleteRowButton)
 		{
-			console.log("Delete Row Pressed for Row");
-			console.log(deleteRowButton.id);
+			//console.log("Delete Row Pressed for Row");
+			//console.log(deleteRowButton.id);
 
 			//make a post to the server; send the bill ID to be deleted
 			$.post("deleteItem", { rowId: deleteRowButton.id }, function(data){
@@ -1015,10 +1023,11 @@
 			//makeTable('tblHolder');
 		}
 
+		//handles ajax update to the server when an update is made in the item column
 		function postUpdateOnItem(value, billID)
 		{
 			//make a post for the particular value
-			console.log("updating item "+value+" at billId "+billID);
+			//console.log("updating item "+value+" at billId "+billID);
 			var newValue = value;
 			newValue = newValue.replace(/'/g, "\\'");
 			$.post("updateItem", { newItem: newValue, billId: billID}, function(data){
@@ -1028,40 +1037,44 @@
 			//no reload necessary	
 		}
 
+		//handles ajax update to the server when an update is made on the amount column
 		function postUpdateOnAmount(value, billID)
 		{
-			console.log("updating amount "+value+" at billId "+billID);
+			//console.log("updating amount "+value+" at billId "+billID);
 			$.post("updateAmount", { newAmount: value, billId: billID}, function(data){
 					makeTable('tblHolder', false);
 				});
 		}
 
+		//handles ajax update to the server when an update is made in the payer dropdown
 		function postUpdateOnPayer(value, billID)
 		{
-			console.log("updating amount "+value+" at billId "+billID);
+			//console.log("updating amount "+value+" at billId "+billID);
 			$.post("updatePayer", { newPayer: value, billId: billID}, function(data){
 					makeTable('tblHolder', false);
 				});
 		}
 
+		//handles ajax update to the server when an update is made to a checkbox
 		function postUpdateOnCheckbox(value, friend, billID)
 		{
 			//figure out which bill id / friend
 			var intValue = 0;
 			if (value) intValue = 1;
 
-			console.log("updating with value: "+intValue+" friend: "+friend+" and billID: "+billID);
+			//console.log("updating with value: "+intValue+" friend: "+friend+" and billID: "+billID);
 
 			//make the post
 			$.post("updateCheckbox", { friendId: friend, newCheck: intValue, billId: billID}, function(data){
-					console.log("reply:");
-					console.log(data);
+					//console.log("reply:");
+					//console.log(data);
 					makeTable('tblHolder', false);
 				});
 
 			//change the local model
 		}
 
+		//handles ajax update to the server when an update is made to the dropdown
 		function updateDropDown(dropdown)
 		{
 			//find the bill ID to change (row #)
@@ -1072,7 +1085,7 @@
 			var friendIndex = dropdown.selectedIndex; 
 
 			//post the change
-			console.log("Dropdown Called with BillID: "+rowId+" to friend #"+friendIndex);
+			//console.log("Dropdown Called with BillID: "+rowId+" to friend #"+friendIndex);
 			postUpdateOnPayer(friendIndex, rowId);
 
 		}
@@ -1165,7 +1178,7 @@
 		<div style="display: table; height: 100px; #position: relative; overflow: hidden; background-color:#00297A; width:100%">
 			<div style=" #position: absolute; #top: 50%;display: table-cell; vertical-align: middle; padding-left:20px">
   				<div class="greenBorder" style=" #position: relative; #top: -50%">
-    				<font color="white"><h1>BillSplitter</h1></font>
+    				<font color="white"><h1>BillSplit.it</h1></font>
 			     </div>
 		    </div>
 		</div>
@@ -1177,11 +1190,12 @@
 
 	<!-- Rest of Divs -->
 	<div id="bodyDiv" style="background-color:#FFFFFF; height:800px;">
-		<div id="infoDiv" style="background-color:#FFFFFF; clear:both;">
+		<div id="infoDiv" style="background-color:#FFFFCC; clear:both;">
 			<center>
 				<?php 
 					if($this->session->userdata('username') == NULL){
-					echo "<h1>Welcome to BillSplitter!</h1>";
+					echo "<h4>Welcome to BillSplit.it!</h4>";
+					echo "To get started, just enter your expense items in the table below. Add your friends to make bill splitting easy!";
 					}
 				?>
 			</center>
@@ -1198,7 +1212,7 @@
 			<div style="vertical-align:middle;">
 				<?php 
 				if($this->session->userdata('username') == NULL){
-					echo "<a class='btn btn-large btn-success' href='" . base_url() . "index.php/login/createAccount'>Save This</a>";
+					echo "<a class='btn btn-large btn-success' href='" . base_url() . "index.php/login/createAccount'>Save This!</a>";
 				}
 				else{
 					echo "<a href='" . base_url() . "index.php/site/collectionsList'>Back to List of Collections</a>";

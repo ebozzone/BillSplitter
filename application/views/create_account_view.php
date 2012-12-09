@@ -10,7 +10,7 @@
 		<div style="display: table; height: 100px; #position: relative; overflow: hidden; background-color:#00297A; width:100%">
     		<div style=" #position: absolute; #top: 50%;display: table-cell; vertical-align: middle; padding-left:20px">
       			<div class="greenBorder" style=" #position: relative; #top: -50%">
-        			<font color="white"><h1>BillSplitter</h1></font>
+        			<font color="white"><h1>BillSplit.it</h1></font>
 			     </div>
 		    </div>
 		</div>

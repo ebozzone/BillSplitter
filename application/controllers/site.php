@@ -12,6 +12,7 @@ class Site extends CI_Controller {
 		//$this->home();
 	}
 
+	//a request to home opens the main website page, a table showing a single collection of expenses
 	public function home(){
 		$this->load->helper('url');
 
@@ -22,19 +23,11 @@ class Site extends CI_Controller {
     	$this->session->set_userdata('collectionName', $collectionData[0]['collectionName']);
     	$this->session->set_userdata('collectionData', $collectionData);
 
-		$data['title'] = "BillSplitter Collection";
-//		$data['options'] = array(
-//			'select' => 'Select One',
-//			'friend1' => 'Evan',
-//			'friend2' => 'Manu',
-//			'friend3' => 'Jon',
-//			'friend4' => 'Dave',
-//			'friend5' => 'Mary',
-//			);
-		
-		//load friend names into 'options'
+		$data['title'] = "BillSplit.it";
+
 		$numFriends = $collectionData[0]['friendCount'];
 
+		//calculate the number of friends, include this information for easy access by the view
 		$data['friends'] = array();
 		for($i = 1; $i < $numFriends + 1; $i++){
 			$friendName = 'friend'.$i;
@@ -43,26 +36,18 @@ class Site extends CI_Controller {
 		$data['numFriends'] = $numFriends;
 		$this->load->helper('form');
 		$this->load->model("get_db");
+
 		//load table of bills for user into an array
-		//$data['results'] = $this->get_db->getAll($this->collectionIdForUser());
 		$data['results'] = $this->get_db->getAll($this->session->userdata('collectionId'));
-		//do the math on who paid, and is owed
-		$data['contributions'] = $this->calculateContributionRows($data['results']);
-		$data['amountsOwed'] = $this->calculateAmountsOwed($data['contributions'], $data['results']);
-		$data['amountsPaid'] = $this->calculateAmountsPaid($data['results']);
-		//echo "results:"."</br>";
-		//print_r($data['results']);
-		//echo "</br>"."contributions:"."</br>";
-		//print_r($contributions);
-		//echo "</br>"."amounts owed:"."</br>";
-		//print_r($amountsOwed);
-		//echo "</br>"."amounts paid:"."</br>";
-		//print_r($amountsPaid);
+
+		//pass this to the view
 		$this->load->view("view_home", $data);
 	}
 
+	//responds to an ajax post request from the client and provides data to populate a collection table
 	public function loadTable(){
 		$this->load->helper('url');
+		
 		//put name of collection into session data
     	$this->load->model("permissions_db");
     	$this->load->model("collectionnames_db");
@@ -70,11 +55,12 @@ class Site extends CI_Controller {
     	$this->session->set_userdata('collectionName', $collectionData[0]['collectionName']);
     	$this->session->set_userdata('collectionData', $collectionData);
 
-		$data['title'] = "BillSplitter Collection";
+		$data['title'] = "BillSplit.it Collection";
 		
 		//load friend names into 'options'
 		$numFriends = $collectionData[0]['friendCount']; // refers to the single row containing metadata about the collection
 
+		//calculate number of friends for easy access
 		$data['friends'] = array();
 		for($i = 1; $i < $numFriends + 1; $i++){
 			$friendName = 'friend'.$i;
@@ -84,25 +70,14 @@ class Site extends CI_Controller {
 		$this->load->helper('form');
 		$this->load->model("get_db");
 		//load table of bills for user into an array
-		//$data['results'] = $this->get_db->getAll($this->collectionIdForUser());
+		
 		$data['results'] = $this->get_db->getAll($this->session->userdata('collectionId'));
-		//do the math on who paid, and is owed
-		//$data['contributions'] = $this->calculateContributionRows($data['results']);
-		//$data['amountsOwed'] = $this->calculateAmountsOwed($data['contributions'], $data['results']);
-		//$data['amountsPaid'] = $this->calculateAmountsPaid($data['results']);
-		//echo "results:"."</br>";
-		//print_r($data['results']);
-		//echo "</br>"."contributions:"."</br>";
-		//print_r($contributions);
-		//echo "</br>"."amounts owed:"."</br>";
-		//print_r($amountsOwed);
-		//echo "</br>"."amounts paid:"."</br>";
-		//print_r($amountsPaid);
-		//print_r($data);
+
+		//encode this information in json format, print it to the screen for the client to read / parse
 		print_r (json_encode($data));
-		//$this->load->view("view_home", $data);
 	}
 
+	//a request made to site/collectionsList produces the view_collections page 
 	public function collectionsList(){
 		$data['title'] = "BillSplitter Dashboard";
 		//load the collections corresponding to the user
@@ -130,6 +105,7 @@ class Site extends CI_Controller {
 		$this->load->view("view_permissions", $data);
 	}
 
+	//a post request made to site/addBill (through ajax) posts an additional item expense entry for a given collection
 	function addBill(){
 		$this->load->model("get_db");
 		//$this->load->model("collectionnames_db");
@@ -160,7 +136,7 @@ class Site extends CI_Controller {
 			"billId" => time(), 
 			"item" => $item,//"Car Rental", 
 			"amount" => $amount,//"250", 
-			"name" => $payer,//$sessionCollectionData[0][$payer],//$this->tempNameForFriend($payer),//, 
+			"name" => $payer,
 			"friend1" => $friend1, 
 			"friend2" => $friend2,
 			"friend3" => $friend3,
@@ -182,6 +158,7 @@ class Site extends CI_Controller {
 		redirect('site/home');
 	}
 
+	//a post request made here adds a new friend column into the database for a given collection
 	function addColumn(){
 		$name = $this->input->post('newColumnName');
 		$this->load->model('collectionnames_db');
@@ -189,15 +166,16 @@ class Site extends CI_Controller {
 		redirect('site/home');
 	}
 
+	//a post request made here removes a given column (given by int 'friendToDelete') for a given collection 
 	function deleteColumn(){
 		$friendIndexToDelete = $this->input->post('friendToDelete');
 		$this->load->model('collectionnames_db');
-		//$friendIndexToDelete++;
 		$this->collectionnames_db->deleteFriendColumnFromCollection($this->session->userdata('collectionId'), $friendIndexToDelete);
 		redirect('site/home');	
 	}
 
-	function updateFriendName(){
+	//a post request made here prompts a database call to change a friend (column header) name
+ 	function updateFriendName(){
 		$this->load->model('collectionnames_db');
 		$index = $this->input->post('friendId');
 		$newName = $this->input->post('newName');
@@ -207,68 +185,15 @@ class Site extends CI_Controller {
 		$this->collectionnames_db->updateFriendName($this->session->userdata('collectionId'), $index, $newName);
 	}
 
+	//a post request made here removes all items from a collection. was used for debugging but we're keeping it in case.
 	function emptyBill(){
 		$this->load->model("get_db");
 
-		//$tableToEmpty = "billsummary";
-
-		//$this->get_db->emptyTable($tableToEmpty);
-		//$this->home();
 		$this->get_db->emptyCollection($this->session->userdata('collectionId'));
 		$this->home();
-		//redirect('site');
 	}
 
-	function tempNameForFriend($friendID){
-		$friendName;
-		switch ($friendID) {
-			case 'friend1':
-				$friendName = "Evan";
-				break;
-			case 'friend2':
-				$friendName = "Manu";
-				break;
-			case 'friend3':
-				$friendName = "Jon";
-				break;
-			case 'friend4':
-				$friendName = "Dave";
-				break;
-			case 'friend5':
-				$friendName = "Mary";
-				break;
-			default:
-				$friendName = 'Rutherford B. Hayes';
-		}
-
-		return $friendName;
-	}
-
-	function tempFriendIdForName($friendName){
-		$friendID;
-		switch ($friendName) {
-			case 'Evan':
-				$friendID = "friend1";
-				break;
-			case 'Manu':
-				$friendID = "friend2";
-				break;
-			case 'Jon':
-				$friendID = "friend3";
-				break;
-			case 'Dave':
-				$friendID = "friend4";
-				break;
-			case 'Mary':
-				$friendID = "friend5";
-				break;
-			default:
-				$friendID = 'friend1';
-		}
-
-		return $friendID;
-	}
-
+	//a post request made here prompts a request to the model to remove an item
 	function deleteItem(){
 		$billId = $this->input->post('rowId');
 		$this->load->model("get_db");
@@ -278,6 +203,7 @@ class Site extends CI_Controller {
 
 	}
 
+	//a post request made here prompts a request to the model to update an item
 	function updateItem(){
 		//we get the item from the post
 		$billId = $this->input->post('billId');
@@ -290,6 +216,7 @@ class Site extends CI_Controller {
 		$this->get_db->updateBill($this->session->userdata('collectionId'), $billId, 'item', $newItem);
 	}
 
+	//a post request made here prompts a request to the model to update a dollar amount
 	function updateAmount(){
 		//we get the item from the post
 		$billId = $this->input->post('billId');
@@ -302,6 +229,7 @@ class Site extends CI_Controller {
 		$this->get_db->updateBill($this->session->userdata('collectionId'), $billId, 'amount', $newAmount);
 	}
 
+	//a post request made here prompts a request to the model to update a payer name
 	function updatePayer(){
 		//we get the item from the post
 		$billId = $this->input->post('billId');
@@ -314,6 +242,7 @@ class Site extends CI_Controller {
 		$this->get_db->updateBill($this->session->userdata('collectionId'), $billId, 'name', $newPayer);
 	}
 
+	//a post request made here prompts a request to the model to update checkbox value
 	function updateCheckbox(){
 		//we get the item from the post
 		$billId = $this->input->post('billId');
@@ -330,79 +259,21 @@ class Site extends CI_Controller {
 		$this->get_db->updateBill($this->session->userdata('collectionId'), $billId, $columnName, $newCheck);
 	}
 
-	function calculateContributionRows($resultsData) {
-		$contributions = array();
-		foreach($resultsData as $index=>$row) {
-			$contributionsRow = array();
-			$numfriends = $row->friend1 + $row->friend2 + $row->friend3 + $row->friend4 + $row->friend5;
-			$itemCost = $row->amount;
-			if ($numfriends == 0) $individualContribution = 0;
-			else $individualContribution = $itemCost / $numfriends;
-			$contributionsRow['friend1'] = 0;
-			$contributionsRow['friend2'] = 0;
-			$contributionsRow['friend3'] = 0;
-			$contributionsRow['friend4'] = 0;
-			$contributionsRow['friend5'] = 0;
-			if ($row->friend1 == 1) $contributionsRow['friend1'] = $individualContribution;
-			if ($row->friend2 == 1) $contributionsRow['friend2'] = $individualContribution; 
-			if ($row->friend3 == 1) $contributionsRow['friend3'] = $individualContribution; 
-			if ($row->friend4 == 1) $contributionsRow['friend4'] = $individualContribution; 
-			if ($row->friend5 == 1) $contributionsRow['friend5'] = $individualContribution;   
-			$contributions[$index] = $contributionsRow;
-		}
-		return $contributions;
-	}
-
-	function calculateAmountsOwed($contributions, $results){
-		$amountsOwed = array();
-
-		//initialize at zero for each friend
-		for($i = 1; $i < 6; $i++){
-			$amountsOwed['friend'.$i] = 0;
-		}		
-
-		//go through each row and add that friend's amount to his running tally
-		foreach($contributions as $contributionRow){
-			//for each friend
-			for($j = 1; $j < 6; $j++){
-				$amountsOwed['friend'.$j] = $amountsOwed['friend'.$j] + $contributionRow['friend'.$j];
-			}
-		
-		}
-		//return value
-		return $amountsOwed;
-	}
-
-	function calculateAmountsPaid($results){
-		$amountsPaid = array();
-
-		//initialize at zero for each friend
-		for($i = 1; $i < 6; $i++){
-			$amountsPaid['friend'.$i] = 0;
-		}
-
-		//go through each entry in the bill and assign it to the right payer
-		foreach($results as $resultsRow){
-			$payer = $resultsRow->name;
-			$amountsPaid[$this->tempFriendIdForName($payer)] = $amountsPaid[$this->tempFriendIdForName($payer)] + $resultsRow->amount; 
-		}
-
-		//return the sums
-		return $amountsPaid;
-
-	}
-
+	//a post request made here prompts a request to the model to change the name of a collection
 	function changeCollectionName() {
+		//get the new collection name
 		$this->load->helper('text');
 		$newCollectionName = $this->input->post('newCollectionName');
 		$newCollectionName = ascii_to_entities($newCollectionName);
-
 		$this->load->model('collectionnames_db');
+
+		//prompt the model to update
 		$this->collectionnames_db->updateCollectionName($this->session->userdata('collectionId'), $newCollectionName);
 		$collectionData = $this->collectionnames_db->getCollectionData($this->session->userdata('collectionId'));
     	echo $collectionData[0]['collectionName'];
 	}
 
+	//a request made here opens a page with the name of the current collection and nothing else. for reference for the view.
 	function collectionName() {
 		$this->load->model("collectionnames_db");
     	$collectionData = $this->collectionnames_db->getCollectionData($this->session->userdata('collectionId'));
@@ -411,26 +282,20 @@ class Site extends CI_Controller {
 
 	//Login Related Stuff
 
+	//checks if a particular user is validated
 	private function check_isvalidated(){
         if(! $this->session->userdata('validated')){
             redirect('login');
         }
     }
 
+	//logs a given user out by destroying their session
     public function do_logout(){
     	$this->session->sess_destroy();
     	redirect('login');
     }
 
     //Collection Related Stuff
-
-//    function collectionIdForUser(){
-//    	$this->load->model("permissions_db");
-//    	$username = $this->session->userdata('username');
-//    	$result = $this->permissions_db->getPermissionsForUser($username);
-//    	// TODO - need to pull more than one collectionId per user
-//    	return $result[0]->collectionId;
-//    }
 
     // Returns all collectionId's associated with the logged in username
     function collectionPermissionsForUser(){
@@ -440,11 +305,13 @@ class Site extends CI_Controller {
     	return $result;
     }
 
+	//stores a collection Id in the user's session data
     function linkCollection(){
     	$this->session->set_userdata('collectionId', $this->input->get('collectionId'));
     	$this->home();
     }
 
+   	//stores a user's collection ID in the user's session data. links to permissions list
     function linkPermissions(){
     	$this->session->set_userdata('collectionId', $this->input->get('collectionId'));
     	$this->permissionsList();
@@ -452,10 +319,14 @@ class Site extends CI_Controller {
 
     //Collection Management
 
+	//creates a new collection for a user
 	function createNewCollectionForUser(){
+		//load models
 		$this->load->library('collectionIdManager');
 		$this->load->model('permissions_db');
 		$this->load->model('collectionnames_db');
+		
+		//generate the new collection id, connect it to the user
 		$newCollectionId = $this->collectionidmanager->generateNewCollectionId();
 		$this->permissions_db->addCollectionIdPermissionForUser($newCollectionId, $this->session->userdata('username')	);
 		$this->collectionnames_db->newCollectionName($newCollectionId);
@@ -463,6 +334,7 @@ class Site extends CI_Controller {
 		redirect('site/home');
 	}
 
+	//removes the user from permissions for a collection. does not destroy the collection
 	function removeCollection(){
 		$collectionId = $this->input->post('collectionId');
 		$this->load->model("permissions_db");
@@ -502,10 +374,12 @@ class Site extends CI_Controller {
 		redirect('site/' . $origin);
 	}
 
+	//easter egg
 	function addPermissions2(){
 		echo "Awesome, this thing worked.";
 	}
 
+	//removes permission for another user
 	function removePermission(){
 		$username = $this->input->post('userToRemove');
 		$this->load->model("permissions_db");
