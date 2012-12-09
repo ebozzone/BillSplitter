@@ -460,7 +460,7 @@ class Site extends CI_Controller {
 		$this->permissions_db->addCollectionIdPermissionForUser($newCollectionId, $this->session->userdata('username')	);
 		$this->collectionnames_db->newCollectionName($newCollectionId);
 		$this->session->set_userdata('collectionId', $newCollectionId);
-		$this->home();
+		redirect('site/home');
 	}
 
 	function removeCollection(){

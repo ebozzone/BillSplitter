@@ -140,7 +140,7 @@
 
 			//header
 			headerRow = document.createElement('tr');
-			//headerRow.style.backgroundColor = "#989898";
+			headerRow.style.backgroundColor = "#C0D8F2";
 			//headerRow.setAttribute("style", "background-color: #000080");
 			
 			var i = 0;
@@ -185,6 +185,7 @@
 				} else {
 					//programatic header name
 					nextHeaderCell.appendChild(document.createTextNode(friendNamesArray[i-3]));
+					nextHeaderCell.style.width = "60px";
 					//nameToSend = friendNamesArray[i-2];
 					nextHeaderCell.onclick = function() {onHeaderClick(this, nameToSend);}
 					nextHeaderCell.id = (i - 3);
@@ -267,8 +268,8 @@
 				curCell = document.createElement('td');
 				deleteRowButton = document.createElement('input');
 				deleteRowButton.type = "button";
-				deleteRowButton.value = " Delete ";
-				deleteRowButton.className = "rowDeleteButton";
+				deleteRowButton.value = " X ";
+				deleteRowButton.className = "btn btn-small btn-danger";
 				deleteRowButton.id = billIdEntries[curY];
 				deleteRowButton.onclick = function() {deleteRow(this);}
 				curCell.appendChild(deleteRowButton);
@@ -494,50 +495,81 @@
 			var textHolder;
 			var itemizedDetailButton;
 			var discrepancy;
+
+			//header row
+			var headerRow = document.createElement('tr');
+			nextCell = document.createElement('td');
+			nextCell.appendChild(document.createTextNode("Friend"));
+			nextCell.style.width = "125px";
+			nextCell.className = "boldCell";
+			headerRow.appendChild(nextCell);
+			nextCell = document.createElement('td');
+			nextCell.appendChild(document.createTextNode("Summary"));
+			nextCell.style.width = "225px";
+			nextCell.className = "boldCell";
+			headerRow.appendChild(nextCell);
+			nextCell = document.createElement('td');
+			nextCell.appendChild(document.createTextNode("Friend Owes:"));
+			nextCell.style.width = "125px";
+			nextCell.className = "boldCell";
+			headerRow.appendChild(nextCell);
+			nextCell = document.createElement('td');
+			headerRow.appendChild(nextCell);
+			rtbody.appendChild(headerRow);
+
 			for (var i = 0; i < numFriends; i++)
 			{
 				nextRow = document.createElement('tr');
 
+				//nameCEll
+				nextCell = document.createElement('td');
+				nextCell.appendChild(document.createTextNode(localModel['friendNamesArray'][i]));
+				nextCell.className = "boldCell";
+				nextRow.appendChild(nextCell);
+
 				//text1 cell
 				nextCell = document.createElement('td');
-				textHolder = localModel['friendNamesArray'][i]+"'s share of the expenses is:";
+				textHolder = localModel['friendNamesArray'][i]+"'s share of the expenses is: "+amountsOwed[i].toFixed(2)+" But "+localModel['friendNamesArray'][i]+" paid: "+amountsPaid[i].toFixed(2)+".";
 				nextCell.appendChild(document.createTextNode(textHolder));
 				nextRow.appendChild(nextCell);
 
 				//owes cell
-				nextCell = document.createElement('td');
-				nextCell.appendChild(document.createTextNode(amountsOwed[i].toFixed(2)));
-				nextRow.appendChild(nextCell);
+				//nextCell = document.createElement('td');
+				//nextCell.appendChild(document.createTextNode());
+				//nextRow.appendChild(nextCell);
 
 				//paid cell
-				nextCell = document.createElement('td');
-				textHolder = "But "+localModel['friendNamesArray'][i]+" paid:";
-				nextCell.appendChild(document.createTextNode(textHolder));
-				nextRow.appendChild(nextCell);
+				//nextCell = document.createElement('td');
+				//textHolder = "But "+localModel['friendNamesArray'][i]+" paid:";
+				//nextCell.appendChild(document.createTextNode(textHolder));
+				//nextRow.appendChild(nextCell);
 
 				//paid cell
-				nextCell = document.createElement('td');
-				nextCell.appendChild(document.createTextNode(amountsPaid[i].toFixed(2)));
-				nextRow.appendChild(nextCell);
+				//nextCell = document.createElement('td');
+				//nextCell.appendChild(document.createTextNode(amountsPaid[i].toFixed(2)));
+				//nextRow.appendChild(nextCell);
 
 				//nextCell = document.createElement('td');
 				nextCell = document.createElement('td');
-				textHolder = "So he/she owes:";
-				nextCell.appendChild(document.createTextNode(textHolder));
+				discrepancy = amountsOwed[i] - amountsPaid[i];
+				var boldString = " "+discrepancy.toFixed(2);
+				boldString.bold();
+				nextCell.appendChild(document.createTextNode(boldString));
+				nextCell.className = "boldCell";
 				nextRow.appendChild(nextCell);
 
 				//paid cell
-				nextCell = document.createElement('td');
-				discrepancy = amountsOwed[i] - amountsPaid[i];
-				nextCell.appendChild(document.createTextNode(discrepancy.toFixed(2)));
-				nextRow.appendChild(nextCell);
+				//nextCell = document.createElement('td');
+				//discrepancy = amountsOwed[i] - amountsPaid[i];
+				//nextCell.appendChild(document.createTextNode(discrepancy.toFixed(2)));
+				//nextRow.appendChild(nextCell);
 
 				//itemized button
 				nextCell = document.createElement('td');
 				itemizedDetailButton = document.createElement('input');
 				itemizedDetailButton.type = "button";
 				itemizedDetailButton.value = " Detail ";
-				itemizedDetailButton.className = "itemizedDetailButton";
+				itemizedDetailButton.className = "btn btn-info";
 				itemizedDetailButton.id = i;
 				itemizedDetailButton.onclick = function() {showItemizedForButton(this);}
 				nextCell.appendChild(itemizedDetailButton);
@@ -608,6 +640,7 @@
 			{
 				nextItemizedTable = document.createElement('table');
 				nextItemizedTable.id = "itemizedTable"+(parseInt(i) + 1);
+				nextItemizedTable.className = "itemizedTable";
 				if (i != showingTable) nextItemizedTable.hidden = true;
 				nextTableBody = document.createElement('tbody');
 
@@ -615,6 +648,7 @@
 				nextRow = document.createElement('tr');
 				nextCell = document.createElement('td');
 				nextCell.appendChild(document.createTextNode("Itemized Table For "+localModel['friendNamesArray'][i]));
+				nextCell.className = "itemizedTableHeaderCell";
 				nextCell.colSpan = 3;
 				nextRow.appendChild(nextCell);
 				nextTableBody.appendChild(nextRow);
@@ -623,12 +657,15 @@
 				nextRow = document.createElement('tr');
 				nextCell = document.createElement('td');
 				nextCell.appendChild(document.createTextNode("Item"));
+				nextCell.style.width = "150px";
 				nextRow.appendChild(nextCell);
 				nextCell = document.createElement('td');
 				nextCell.appendChild(document.createTextNode("Share"));
+				nextCell.style.width = "50px";
 				nextRow.appendChild(nextCell);
 				nextCell = document.createElement('td');
 				nextCell.appendChild(document.createTextNode("Amount"));
+				nextCell.style.width = "100px";
 				nextRow.appendChild(nextCell);
 				nextTableBody.appendChild(nextRow);
 				
@@ -1057,6 +1094,61 @@
 		border: none;
 		width: 100%;
 	}
+	#resultsTable
+	{
+		font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+		font-size: 12px;
+		background: #fff;
+		width: 480px;
+		border-collapse: collapse;
+		text-align: left;
+		margin-left:20px;
+	}
+	#resultsTable th
+	{
+		font-size: 14px;
+		font-weight: normal;
+		color: #039;
+		padding: 10px 8px;
+		border-bottom: 2px solid #6678b1;
+	}
+	#resultsTable td
+	{
+		color: #669;
+		padding: 9px 8px 0px 8px;
+		text-align:left;
+	}
+	#resultsTable .boldCell
+	{
+		font-size: 14px;
+		font-weight:1100;
+	}
+	#resultsTable tbody tr:hover td
+	{
+		color: #009;
+	}
+	.itemizedTable
+	{
+		border:1px solid #171717;
+	}
+	.itemizedTable td
+	{
+		text-align: left;
+	}
+	.btn-toolbar
+	{
+		margin-top: 0px;
+		margin-bottom: 0px;
+	}
+	.btn
+	{
+		margin-top: 0px;
+		margin-bottom: 0px;
+		padding-top:0px;
+		padding-bottom:0px;
+		height:27px;
+	}
+
 	</style>
 <head>
 	<title>Test</title>
@@ -1069,86 +1161,102 @@
 <body onload="makeTable('tblHolder');">
 	
 	<!--BillSpliter banner -->
-	<div style="display: table; height: 100px; #position: relative; overflow: hidden; background-color:#00297A; width:100%">
-		<div style=" #position: absolute; #top: 50%;display: table-cell; vertical-align: middle; padding-left:20px">
-  			<div class="greenBorder" style=" #position: relative; #top: -50%">
-    			<font color="white"><h1>BillSplitter</h1></font>
-		     </div>
-	    </div>
-	</div>
+	<a style="display:block" href="<?php echo base_url(); ?>">
+		<div style="display: table; height: 100px; #position: relative; overflow: hidden; background-color:#00297A; width:100%">
+			<div style=" #position: absolute; #top: 50%;display: table-cell; vertical-align: middle; padding-left:20px">
+  				<div class="greenBorder" style=" #position: relative; #top: -50%">
+    				<font color="white"><h1>BillSplitter</h1></font>
+			     </div>
+		    </div>
+		</div>
+	</a>
 	
 	<!-- Below the Banner -->
 	
-	<?php 
-		if($this->session->userdata('username') == NULL){
-			echo "<h1>Welcome to BillSplitter!</h1>";
-		}
-	?>
+	
 
 	<!-- Rest of Divs -->
-	<div id="bodyDiv" style="background-color:#f9f9f9; height:800px;">
-		<div id="titleDiv" style="background-color:#7094B8; float:left; height:50px; width:500px; padding:10px;">
-			Title
+	<div id="bodyDiv" style="background-color:#FFFFFF; height:800px;">
+		<div id="infoDiv" style="background-color:#FFFFFF; clear:both;">
+			<center>
+				<?php 
+					if($this->session->userdata('username') == NULL){
+					echo "<h1>Welcome to BillSplitter!</h1>";
+					}
+				?>
+			</center>
 		</div>
-		<div id="backLinkDiv" style="background-color:#D69554; float:right; height:50px; width:200px; padding:10px; padding-left:20px;">
-			Link Back to Collections
+		<!-- Title -->
+		<div id="titleDiv" style="background-color:#FFFFFF; float:left; width:600px; padding:10px;">
+			<h2><div style="width:100%; float:left; padding-left:10px;"><div id="collectionNameHolder" > </div></div></h2>
+			<div style="float:left; padding-left:10px;">
+				<i>(click to change)</i>
+			</div>
 		</div>
-		<div id="topPanel" style="background-color:#339933; clear:both; height:50px;">
-			Buttons to Add / Remove Friend
+		<!-- Link to Collections -->
+		<div id="backLinkDiv" style="background-color:#FFFFFF; float:right; height:50px; width:200px; padding:10px; padding-left:10px; padding-right:50px;">
+			<div style="vertical-align:middle;">
+				<?php 
+				if($this->session->userdata('username') == NULL){
+					echo "<a class='btn btn-large btn-success' href='" . base_url() . "index.php/login/createAccount'>Save This</a>";
+				}
+				else{
+					echo "<a href='" . base_url() . "index.php/site/collectionsList'>Back to List of Collections</a>";
+				}
+				?>
+			</div>
 		</div>
-		<div id="tableDiv" style="background-color:#AD855C; clear:left; height: 200px;">
-			Table
+		<!-- Panel of Buttons to Add/Remove Friends -->
+		<div id="topPanel" style="background-color:#FFFFFF; clear:both; padding:10px; padding-left:20px;">
+			<input id="addFriendButton" type="button" value="Add Friend" onclick="addColumn();" />
+			<input id="deleteColumnsButton" type="button" value="Remove Friend" onclick="toggleColumnDeleteButtons();" />
 		</div>
-		<div id="addItemButtonDiv" style="background-color:#CCB2FF; clear:both; height:50px;">
-			Button Goes Here
+		<!-- Div for Table Holder (which holds Table) -->
+		<div id="tableDiv" style="background-color:#FFFFFF; clear:left;">
+			<div id="tblHolder" style="float:left; padding-left:20px;"></div>
 		</div>
-		<div id="bufferDiv" style="background-color:#999966; clear:both; height:50px;">
-			Buffer Space
+		<!-- Div for Add Item Button -->
+		<div id="addItemButtonDiv" style="background-color:#FFFFFF; clear:both; height:50px; padding-left:20px;">
+			<div id ="submitButtonHolder"></div>
+		</div>
+		<div id="bufferDiv" style="background-color:#FFFFFF; clear:both; padding-left:60px; height:100px;">
+			
+				<p><b>Share this Collection with friends:</b></p>
+				<?php 
+					//echo form_open('site/addPermissions', '', array('collectionId' => $this->session->userdata('collectionId'), 'origin' => 'home'));
+					echo form_input(array('id' => 'addPermissionsInput', 'name' => 'emails', 'value' => 'Enter Email(s) Separated by Commas', 'style' => 'width:300px'));
+					echo form_button(array('id' => 'addPermissionsButton', 'content' => 'Share'));
+					//echo form_submit('addPermissions', 'Share');
+					//echo form_close();
+				?>
+				<?php
+					if($this->session->flashdata('emails_array_invalid') != NULL){
+						echo "<font color=red>Invalid Emails Entered: ";
+						foreach($this->session->flashdata('emails_array_invalid') as $email){
+							echo $email;
+							echo " ";
+						}
+						echo "</font>";
+					}	
+				?>
+				
 		</div>	
-		<div id="resultsDiv" style="background-color:#FFB894; float:left; height:200px; width:450px;">
-			Results 
+		<div id="resultsDiv" style="background-color:#FFFFFF; float:left; width:450px; padding-left:20px;">
+			<h3>And, the results:</h3>
+			<div id="resultsTableDiv"></div>
 		</div>
-		<div id="itemizedDetailDiv" style="background-color:#85FFAD; overflow:hidden; height:200px; text-align:center;">
-			Itemized Detail
-			<center><div id="interiorItemizedTableDiv" style="background-color:#99CCFF; width:300px; height:200px;">
-				Itemized Table
+		<div id="itemizedDetailDiv" style="background-color:#FFFFFF; overflow:hidden; text-align:center;">
+			
+			<center><div id="interiorItemizedTableDiv" style="background-color:#FFFFFF; width:300px;">
+				<div id="itemizedTableDiv"></div>
 			</div></center>
 		</div> 
 
 	</div>
 		
-	<h2><div style="width:100%; float:left; padding-left:20px;"><div id="collectionNameHolder" > </div></h2>
-		<div style="float:right; padding-right:50px;">
-		<?php 
-			if($this->session->userdata('username') == NULL){
-				echo "<a href='" . base_url() . "index.php/login/createAccount'>Save this collection for later</a>";
-			}
-			else{
-				echo "<a href='" . base_url() . "index.php/site/collectionsList'>Back to List of Collections</a>";
-			}
-		?>
-	</div>
-	</div>
+	
 
-	<div>
-		<input id="addFriendButton" type="button" value="Add Friend" onclick="addColumn();" />
-		<input id="deleteColumnsButton" type="button" value="Remove Friend" onclick="toggleColumnDeleteButtons();" />
-	</div>
-	<div id="tblButtonsHolder"></div>
-	</br>
-	<div><div id="tblHolder" style="float:left; padding-left:20px;"></div></div>
-	</br>
-	<p></p>
-	<div id="inputsArea" style="float:left; padding-left:20px;">
-		<div id ="submitButtonHolder"></div>
-		<!-- Can't do this yet, because there's no server running php! -->
-		<!--<?php echo form_button(array('id' => 'submitButton', 'content' => 'Add Item!')); ?>-->
-		
-	</div>
-	<div id="resultsArea"> Stuff is here
-		<div id="resultsTableDiv"></div>
-		<div id="itemizedTableDiv"></div>
-	</div>
+
 
 <!--           -->
 

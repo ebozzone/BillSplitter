@@ -2,16 +2,31 @@
 <html>
 <head>
 	<title><?php echo $title; ?></title>
-
+	<link href="<?php echo base_url(); ?>/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
 	<script>
 
 	</script>
 
 </head>
 <body>
+	<script src="<?php echo base_url(); ?>/jquery-1.8.3.min.js"></script>
+	<script src="<?php echo base_url(); ?>/bootstrap/js/bootstrap.min.js"></script>
 
-<div id="container">
-	<h1>Permissions for Collection: [TO COME]</h1>
+	<!-- Banner -->
+	<a style="display:block" href="<?php echo base_url(); ?>">
+		<div style="display: table; height: 100px; #position: relative; overflow: hidden; background-color:#00297A; width:100%">
+    		<div style=" #position: absolute; #top: 50%;display: table-cell; vertical-align: middle; padding-left:20px">
+      			<div class="greenBorder" style=" #position: relative; #top: -50%">
+        			<font color="white"><h1>BillSplitter</h1></font>
+			     </div>
+		    </div>
+		</div>
+	</a>
+
+<div id="container" style="padding-left:20px;">
+	<h1>Permissions for Collection</h1>
+	<p>Here you can share this collection with friends, or remove permissions from them.
+	<p>
 	
 	<a href='<?php echo base_url()?>index.php/site/collectionsList'>Back to List of Collections</a>
 
