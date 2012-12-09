@@ -47,15 +47,15 @@ class Login_model extends CI_Model{
 
 		//let's check the results
 		if($query->num_rows == 0){
-			return true;
+			return false;
 		}
-		else return false;
+		else return true;
 	}
 
-	public function addUserEntry($username, $password){
+	public function addUserEntry($username, $password, $firstname){
 		$data = array(
 				'username' => $username,
-				'fname' => 'John',
+				'fname' => $firstname,
 				'lname' => 'Doe',
 				'password' => $password
 			);

@@ -33,17 +33,24 @@
 			byId(strHolderId).appendChild(nameTable);
 		}
 
-		function makeTable(strParentId)
+		function makeTable(strParentId, focus)
 		{
+			if(typeof(focus)==='undefined') focus = true;
+
 			//Get the data to load the table from site/loadTable
 			$.post("loadTable", {origin: "loadingtable"}, function(data){
-					makeTable2(strParentId, data);
+					makeTable2(strParentId, data, focus);
 				});
 
-			loadCollectionName('collectionNameHolder', '<?php echo $this->session->userdata('collectionName') ?>');
+			$.post("collectionName", {}, function(data){
+				loadCollectionName('collectionNameHolder', data);
+
+			});
+
+			//loadCollectionName('collectionNameHolder', '<?php echo $this->session->userdata('collectionName') ?>');
 		}
 
-		function makeTable2(strParentId, data)
+		function makeTable2(strParentId, data, focus)
 		{
 			var table, tbody, curX, curY, curRow, curCell
 			table = document.createElement('table');
@@ -315,7 +322,7 @@
 					addRowFormSubmitPressed();
 				}
 			}
-			payerInput.selectedIndex = 1; //this selects which one is highlighted at the moment
+			payerInput.selectedIndex = 0; //this selects which one is highlighted at the moment
 			curCell.appendChild(payerInput);
 			formRow.appendChild(curCell);
 
@@ -381,9 +388,12 @@
 			runCalculation();
 
 			//select the item input (IF THE OPTION IS REQUESTED)
-			var inputTarget = $('#itemInput');
-			inputTarget.focus();
-			inputTarget.select();
+			if (focus)
+			{
+				var inputTarget = $('#itemInput');
+				inputTarget.focus();
+				inputTarget.select();
+			}
 			
 		}
 
@@ -476,6 +486,7 @@
 			var nextCell;
 			var textHolder;
 			var itemizedDetailButton;
+			var discrepancy;
 			for (var i = 0; i < numFriends; i++)
 			{
 				nextRow = document.createElement('tr');
@@ -488,7 +499,7 @@
 
 				//owes cell
 				nextCell = document.createElement('td');
-				nextCell.appendChild(document.createTextNode(amountsOwed[i]));
+				nextCell.appendChild(document.createTextNode(amountsOwed[i].toFixed(2)));
 				nextRow.appendChild(nextCell);
 
 				//paid cell
@@ -499,7 +510,7 @@
 
 				//paid cell
 				nextCell = document.createElement('td');
-				nextCell.appendChild(document.createTextNode(amountsPaid[i]));
+				nextCell.appendChild(document.createTextNode(amountsPaid[i].toFixed(2)));
 				nextRow.appendChild(nextCell);
 
 				//nextCell = document.createElement('td');
@@ -510,7 +521,8 @@
 
 				//paid cell
 				nextCell = document.createElement('td');
-				nextCell.appendChild(document.createTextNode(amountsOwed[i] - amountsPaid[i]));
+				discrepancy = amountsOwed[i] - amountsPaid[i];
+				nextCell.appendChild(document.createTextNode(discrepancy.toFixed(2)));
 				nextRow.appendChild(nextCell);
 
 				//itemized button
@@ -579,6 +591,8 @@
 			var nextTableBody;
 			var nextRow;
 			var nextCell;
+			var nextDisplayAmount;
+			var nextDisplayDiscrepancy;
 
 			var itemizedTableContainer = byId('itemizedTableDiv');
 				itemizedTableContainer.innerHTML = "";
@@ -637,7 +651,7 @@
 					nextCell.appendChild(document.createTextNode(myShareText));
 					nextRow.appendChild(nextCell);
 					nextCell = document.createElement('td');
-					nextCell.appendChild(document.createTextNode(itemizedArray[i]['amounts'][j]));
+					nextCell.appendChild(document.createTextNode(itemizedArray[i]['amounts'][j].toFixed(2)));
 					nextRow.appendChild(nextCell);
 					nextTableBody.appendChild(nextRow);
 				}
@@ -650,7 +664,7 @@
 				nextCell.colSpan = 2;
 				nextRow.appendChild(nextCell);
 				nextCell = document.createElement('td');
-				nextCell.appendChild(document.createTextNode(amountsOwed[i]));
+				nextCell.appendChild(document.createTextNode(amountsOwed[i].toFixed(2)));
 				nextRow.appendChild(nextCell);
 				nextTableBody.appendChild(nextRow);
 				
@@ -661,7 +675,7 @@
 				nextCell.colSpan = 2;
 				nextRow.appendChild(nextCell);
 				nextCell = document.createElement('td');
-				nextCell.appendChild(document.createTextNode(amountsPaid[i]));
+				nextCell.appendChild(document.createTextNode(amountsPaid[i].toFixed(2)));
 				nextRow.appendChild(nextCell);
 				nextTableBody.appendChild(nextRow);
 
@@ -672,7 +686,8 @@
 				nextCell.colSpan = 2;
 				nextRow.appendChild(nextCell);
 				nextCell = document.createElement('td');
-				nextCell.appendChild(document.createTextNode(amountsOwed[i] - amountsPaid[i]));
+				nextDisplayDiscrepancy = amountsOwed[i] - amountsPaid[i];
+				nextCell.appendChild(document.createTextNode(nextDisplayDiscrepancy.toFixed(2)));
 				nextRow.appendChild(nextCell);
 				nextTableBody.appendChild(nextRow);
 
@@ -735,7 +750,7 @@
 				$.post("updateFriendName", { friendId: parentNode.id, newName: cellTxt }, function(data){
 					console.log("Updating:");
 					console.log(data);
-					makeTable('tblHolder');
+					makeTable('tblHolder', false);
 				});
 
 				//reload the table
@@ -949,7 +964,7 @@
 
 			//make a post to the server; send the bill ID to be deleted
 			$.post("deleteItem", { rowId: deleteRowButton.id }, function(data){
-					makeTable('tblHolder');
+					makeTable('tblHolder', false);
 				});
 
 			//upon success reload the table
@@ -963,7 +978,7 @@
 			var newValue = value;
 			newValue = newValue.replace(/'/g, "\\'");
 			$.post("updateItem", { newItem: newValue, billId: billID}, function(data){
-					makeTable('tblHolder');
+					makeTable('tblHolder', false);
 				});
 
 			//no reload necessary	
@@ -973,7 +988,7 @@
 		{
 			console.log("updating amount "+value+" at billId "+billID);
 			$.post("updateAmount", { newAmount: value, billId: billID}, function(data){
-					makeTable('tblHolder');
+					makeTable('tblHolder', false);
 				});
 		}
 
@@ -981,7 +996,7 @@
 		{
 			console.log("updating amount "+value+" at billId "+billID);
 			$.post("updatePayer", { newPayer: value, billId: billID}, function(data){
-					makeTable('tblHolder');
+					makeTable('tblHolder', false);
 				});
 		}
 
@@ -997,7 +1012,7 @@
 			$.post("updateCheckbox", { friendId: friend, newCheck: intValue, billId: billID}, function(data){
 					console.log("reply:");
 					console.log(data);
-					makeTable('tblHolder');
+					makeTable('tblHolder', false);
 				});
 
 			//change the local model
@@ -1038,11 +1053,11 @@
 	</style>
 <head>
 	<title>Test</title>
-	<link href="BillSplitter/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+	<link href="<?php echo base_url(); ?>/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
 	<!--<script src="BillSplitter/jquery-1.8.3.min.js"></script>-->
 	<script src="<?php echo base_url(); ?>/jquery-1.8.3.min.js"></script>
 	<!--<script src="http://code.jquery.com/jquery-latest.js"></script>-->
-    <script src="BillSplitter/bootstrap/js/bootstrap.min.js"></script>
+    <script src="<?php echo base_url(); ?>/bootstrap/js/bootstrap.min.js"></script>
 </head>
 <body onload="makeTable('tblHolder');">
 	
@@ -1051,7 +1066,7 @@
 			echo "Homey";
 		}
 		else{
-			echo $this->session->userdata('username'); 
+			echo $this->session->userdata('fname'); 
 		}
 	?>! </h1>
 	

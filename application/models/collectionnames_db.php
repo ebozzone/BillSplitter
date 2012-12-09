@@ -8,7 +8,8 @@ class Collectionnames_db extends CI_Model{
 				'collectionName' => "New Collection",
 				'friend1' => "Me",
 				'friend2' => "Friend 1",
-				'friend3' => "Friend 2"
+				'friend3' => "Friend 2",
+				'friendCount' => 3
 			);
 		$this->db->insert("collectionnames", $data);
 	}

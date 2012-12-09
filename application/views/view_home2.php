@@ -539,7 +539,7 @@
 	<script src="<?php echo base_url(); ?>/jquery-1.8.3.min.js"></script>
 	<!-- <link href="BillSplitter/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen"> -->
 	<!-- <script src="BillSplitter/bootstrap/js/bootstrap.min.js"></script> -->
-	<!--<script>
+	<script>
 		$(document).ready(function(){
 			$('#addPermissionsButton').click(function(){
 				var button = $(this);
@@ -549,7 +549,7 @@
 					console.log(awesomeText);
 				});
 			});
-		});-->
+		});
 
 
 
