@@ -19,9 +19,12 @@
 			var nameTable, ntbody, nRow, nCell;
 			nameTable = document.createElement('table');
 			nameTable.id = "collectionNameTable";
+			nameTable.style.width = "500px";
 			ntbody = document.createElement('tbody');
 			nRow = document.createElement('tr');
 			nCell = document.createElement('td');
+			nCell.style.width = "300px";
+			nCell.setAttribute("style", "text-align:left");
 			nCell.appendChild(document.createTextNode(collectionName));
 			nCell.onclick = function() {onCellClick(this);}
 			nCell.id = "collectionNameCell";
@@ -59,6 +62,7 @@
 			var sideLen = 9;
 			table.appendChild(tbody);
 			table.className = "table table-striped table-bordered table-condensed";
+
 			
 			//parse data object into the various arrays
 
@@ -175,6 +179,9 @@
 				//first three columns are header names; last three have delete buttons for columns
 				if (i < 3) {
 					nextHeaderCell.appendChild(document.createTextNode(headerNames[i]));
+					if (i == 0) nextHeaderCell.style.width = "250px";
+					if (i == 1) nextHeaderCell.style.width = "100px";
+					if (i == 2) nextHeaderCell.style.width = "100px";
 				} else {
 					//programatic header name
 					nextHeaderCell.appendChild(document.createTextNode(friendNamesArray[i-3]));
@@ -1061,39 +1068,89 @@
 </head>
 <body onload="makeTable('tblHolder');">
 	
-	<h1>Welcome to BillSplitter, <?php 
-		if($this->session->userdata('username') == NULL){
-			echo "Homey";
-		}
-		else{
-			echo $this->session->userdata('fname'); 
-		}
-	?>! </h1>
+	<!--BillSpliter banner -->
+	<div style="display: table; height: 100px; #position: relative; overflow: hidden; background-color:#00297A; width:100%">
+		<div style=" #position: absolute; #top: 50%;display: table-cell; vertical-align: middle; padding-left:20px">
+  			<div class="greenBorder" style=" #position: relative; #top: -50%">
+    			<font color="white"><h1>BillSplitter</h1></font>
+		     </div>
+	    </div>
+	</div>
 	
-	<h2><?php echo $this->session->userdata('collectionName') ?></h2>	
-	<div id="collectionNameHolder"></div>
+	<!-- Below the Banner -->
 	
-
 	<?php 
 		if($this->session->userdata('username') == NULL){
-			echo "<a href='" . base_url() . "index.php/login/createAccount'>Save this collection for later</a>";
-		}
-		else{
-			echo "<a href='" . base_url() . "index.php/site/collectionsList'>Back to List of Collections</a>";
+			echo "<h1>Welcome to BillSplitter!</h1>";
 		}
 	?>
+
+	<!-- Rest of Divs -->
+	<div id="bodyDiv" style="background-color:#f9f9f9; height:800px;">
+		<div id="titleDiv" style="background-color:#7094B8; float:left; height:50px; width:500px; padding:10px;">
+			Title
+		</div>
+		<div id="backLinkDiv" style="background-color:#D69554; float:right; height:50px; width:200px; padding:10px; padding-left:20px;">
+			Link Back to Collections
+		</div>
+		<div id="topPanel" style="background-color:#339933; clear:both; height:50px;">
+			Buttons to Add / Remove Friend
+		</div>
+		<div id="tableDiv" style="background-color:#AD855C; clear:left; height: 200px;">
+			Table
+		</div>
+		<div id="addItemButtonDiv" style="background-color:#CCB2FF; clear:both; height:50px;">
+			Button Goes Here
+		</div>
+		<div id="bufferDiv" style="background-color:#999966; clear:both; height:50px;">
+			Buffer Space
+		</div>	
+		<div id="resultsDiv" style="background-color:#FFB894; float:left; height:200px; width:450px;">
+			Results 
+		</div>
+		<div id="itemizedDetailDiv" style="background-color:#85FFAD; overflow:hidden; height:200px; text-align:center;">
+			Itemized Detail
+			<center><div id="interiorItemizedTableDiv" style="background-color:#99CCFF; width:300px; height:200px;">
+				Itemized Table
+			</div></center>
+		</div> 
+
+	</div>
+		
+	<h2><div style="width:100%; float:left; padding-left:20px;"><div id="collectionNameHolder" > </div></h2>
+		<div style="float:right; padding-right:50px;">
+		<?php 
+			if($this->session->userdata('username') == NULL){
+				echo "<a href='" . base_url() . "index.php/login/createAccount'>Save this collection for later</a>";
+			}
+			else{
+				echo "<a href='" . base_url() . "index.php/site/collectionsList'>Back to List of Collections</a>";
+			}
+		?>
+	</div>
+	</div>
+
+	<div>
+		<input id="addFriendButton" type="button" value="Add Friend" onclick="addColumn();" />
+		<input id="deleteColumnsButton" type="button" value="Remove Friend" onclick="toggleColumnDeleteButtons();" />
+	</div>
 	<div id="tblButtonsHolder"></div>
-	<div id="tblHolder"></div>
-	<div id="inputsArea">
+	</br>
+	<div><div id="tblHolder" style="float:left; padding-left:20px;"></div></div>
+	</br>
+	<p></p>
+	<div id="inputsArea" style="float:left; padding-left:20px;">
 		<div id ="submitButtonHolder"></div>
 		<!-- Can't do this yet, because there's no server running php! -->
 		<!--<?php echo form_button(array('id' => 'submitButton', 'content' => 'Add Item!')); ?>-->
-		<input id="addFriendButton" type="button" value="Add Friend" onclick="addColumn();" />
-		<input id="deleteColumnsButton" type="button" value="Remove Friend" onclick="toggleColumnDeleteButtons();" />
+		
 	</div>
 	<div id="resultsArea"> Stuff is here
 		<div id="resultsTableDiv"></div>
 		<div id="itemizedTableDiv"></div>
 	</div>
+
+<!--           -->
+
 </body>
 </html>
